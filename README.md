@@ -2,16 +2,15 @@
 
 <!-- ![Yieldmaker Logo](https://via.placeholder.com/150?text=Yieldmaker)  -->
 
-**Yieldmaker** is an AI-powered platform that makes decentralized finance (DeFi) yield investing seamless, safe, and accessible to all. Whether you're a crypto novice like a fish seller in a village or an experienced trader, Yieldmaker empowers you to earn 10–20% yields with confidence, without navigating complex dashboards or risking scams.
+**Yieldmaker** is an AI-powered platform that makes decentralized finance (DeFi) yield investing seamless, safe, and accessible to all. Whether you're a crypto novice like a fish seller in a village or an experienced trader, Yieldmaker empowers you to earn yields with confidence, without navigating complex dashboards or risking scams.
 
 ---
 
 ## The Problem: DeFi Discovery is Broken
-
 Decentralized Finance (DeFi) offers attractive yields, but accessing these opportunities is a nightmare for most users:
 
 - **Information Overload**: Finding reliable DeFi protocols requires juggling multiple platforms (e.g., DeFiLlama, Etherscan, protocol websites), leading to "50 tabs + 10 dashboards" fatigue.
-- **Complexity**: Evaluating protocol legitimacy—through Total Value Locked (TVL), smart contract audits, and blockchain risks—demands technical expertise most users lack.
+- **Complexity**: Evaluating protocol legitimacy through Total Value Locked (TVL), smart contract audits, and blockchain risks demands technical expertise most users lack.
 - **Inaccessibility**: Non-technical users, like small business owners or everyday savers, are excluded due to crypto jargon, wallet setups, and manual transaction processes.
 - **Lack of Personalization**: Current tools don’t tailor strategies to individual risk profiles (e.g., conservative vs. aggressive investors).
 - **Trust Barriers**: With $3.7B lost to DeFi hacks and scams in 2022 (Chainalysis), users struggle to identify "legit" opportunities, risking capital on unverified protocols.
@@ -23,7 +22,7 @@ This complexity alienates millions of potential investors, leaving DeFi’s $100
 
 ## The Solution: Yieldmaker
 
-**Yieldmaker** is an LLM-powered DeFi agent that simplifies the entire yield investment process into a seamless, beginner-friendly experience. Our mission is to democratize DeFi, enabling anyone from a village fish seller to a seasoned trader to safely earn yields with minimal effort.
+**Yieldmaker** is an LLM-powered DeFi agent that simplifies the entire yield investment process into a seamless, beginner friendly experience. Our mission is to democratize DeFi, enabling anyone from a village fish seller to a seasoned trader to safely earn yields with minimal effort.
 
 ### Key Features
 1. **Conversational AI Interface**  
