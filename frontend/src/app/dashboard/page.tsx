@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import MainDashboard from "@/components/Dashboard/MainDashboard";
 import { User } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
@@ -11,7 +13,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (isConnected && address) {
-      // In a real app, you'd fetch user data from your backend
       setUser({
         address,
         balance: 0, // This would be fetched from the blockchain
@@ -24,15 +25,22 @@ export default function DashboardPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Connect Your Wallet
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Please connect your wallet to access the dashboard
-          </p>
-          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Connect Your Wallet
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              Please connect your wallet to access the dashboard
+            </p>
+            <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
+            <Button variant="outline" className="w-full">
+              Connect Wallet
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -40,10 +48,17 @@ export default function DashboardPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse mb-4"></div>
-          <p className="text-gray-600">Loading your profile...</p>
-        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl font-semibold text-gray-900">
+              Loading Dashboard
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
+            <p className="text-gray-600">Loading your profile...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }

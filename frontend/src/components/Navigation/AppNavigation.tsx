@@ -96,9 +96,6 @@ export default function AppNavigation() {
             })}
           </nav>
 
-          <div className="p-6 border-t border-gray-200">
-            <ConnectButton />
-          </div>
         </div>
       </div>
 

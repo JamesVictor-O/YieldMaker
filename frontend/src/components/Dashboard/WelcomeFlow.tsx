@@ -68,7 +68,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ user, onComplete }) => {
   const selectedAnswer = answers[currentQuestion.id];
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 border border-gray-200">
+    <div className="max-w-2xl  mx-auto bg-white rounded-2xl p-8 border border-gray-200">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Welcome to Yieldmaker! 👋</h2>
