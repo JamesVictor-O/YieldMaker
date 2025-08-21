@@ -17,7 +17,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ user }) => {
   const handleWelcomeComplete = (
     riskProfile: "conservative" | "moderate" | "aggressive"
   ) => {
-    // Update user profile
     user.riskProfile = riskProfile;
     setShowWelcome(false);
   };
@@ -189,8 +188,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ user }) => {
               </div>
             </CardContent>
           </Card>
-
-         
         </div>
       </div>
     </div>
