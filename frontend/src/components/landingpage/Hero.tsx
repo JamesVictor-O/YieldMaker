@@ -28,7 +28,7 @@ const HeroSection = () => {
             <p className="text-xl text-text-light mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-up">
               From everyday <span className="text-[#FFCE4A]">Savers</span> to
               everyday <span className="text-[#FFCE4A]">Earners</span> ,
-              Yieldmaker's AI guides you to safe, high-yield DeFi opportunities
+              Yieldmaker&apos;s AI guides you to safe, high-yield DeFi opportunities
               with simple conversations no crypto expertise needed.
             </p>
 
