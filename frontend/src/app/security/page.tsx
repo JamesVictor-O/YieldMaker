@@ -6,7 +6,7 @@ import {
   Shield,
   CheckCircle,
   AlertTriangle,
-  XCircle,
+
   Info,
 } from "lucide-react";
 import { User } from "@/types";

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage, User, Protocol } from '../../types';
+import { ChatMessage, User} from '../../types';
 
 interface AIChatProps {
   user: User;

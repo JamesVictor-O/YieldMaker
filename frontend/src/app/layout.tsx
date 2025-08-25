@@ -42,7 +42,7 @@ export default function RootLayout({
         <Web3Provider>
           <Header />
           {children}
-          {/* <Footer /> */}
+          <Footer />
         </Web3Provider>
       </body>
     </html>

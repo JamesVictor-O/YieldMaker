@@ -3,13 +3,17 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import {
-  User,
-  Settings as SettingsIcon,
   Shield,
   Bell,
-  Globe,
   Palette,
 } from "lucide-react";
+
+interface User {
+  address: string;
+  balance: number;
+  isNewUser: boolean;
+  riskProfile: "conservative" | "moderate" | "aggressive";
+}
 import ConnectWallet from "@/components/Web3/ConnectWallet";
 
 interface UserSettings {
@@ -75,7 +79,7 @@ export default function SettingsPage() {
   const handleSettingChange = (
     category: keyof UserSettings,
     key: string,
-    value: any
+    value: boolean | number | string
   ) => {
     setSettings((prev) => ({
       ...prev,

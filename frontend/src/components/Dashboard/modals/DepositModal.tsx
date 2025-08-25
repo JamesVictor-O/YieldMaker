@@ -79,7 +79,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
         setIsLoading(false);
       }, 1500);
     } catch (err) {
-      setError("Transaction failed. Please try again.");
+      setError(`Transaction failed. Please try again. ${err}`);
       setIsLoading(false);
     }
   };

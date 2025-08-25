@@ -6,7 +6,7 @@ interface WelcomeFlowProps {
   onComplete: (riskProfile: 'conservative' | 'moderate' | 'aggressive') => void;
 }
 
-const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ user, onComplete }) => {
+const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
