@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { User } from "../../types";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card,  CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
@@ -19,7 +19,7 @@ interface InvestmentChatProps {
   user: User;
 }
 
-const InvestmentChat: React.FC<InvestmentChatProps> = ({ user }) => {
+const InvestmentChat: React.FC<InvestmentChatProps> = ({ }) => {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -114,7 +114,7 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({ user }) => {
   };
 
   return (
-    <Card className="h-full max-h-[600px] flex flex-col">
+    <Card className="h-full max-h-[600px] overflow-scroll flex flex-col">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">

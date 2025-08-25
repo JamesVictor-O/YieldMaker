@@ -88,7 +88,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
         setSuccess(false);
         setIsLoading(false);
       }, 1500);
-    } catch (err) {
+    } catch {
       setError("Withdrawal failed. Please try again.");
       setIsLoading(false);
     }
@@ -207,7 +207,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
               <span className="font-medium">$0.00</span>
             </div>
             <div className="border-t pt-2 flex justify-between text-sm font-semibold">
-              <span> You'll Receive</span>
+              <span> You&apos;ll Receive</span>
               <span>
                 ${amount ? parseFloat(amount).toLocaleString() : "0.00"}
               </span>

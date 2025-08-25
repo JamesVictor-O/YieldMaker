@@ -4,10 +4,8 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Shield,
-  AlertTriangle,
 } from "lucide-react";
 import { User, Protocol } from "@/types";
 import ConnectWallet from "@/components/Web3/ConnectWallet";

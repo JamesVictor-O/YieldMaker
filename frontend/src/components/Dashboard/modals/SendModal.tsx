@@ -64,7 +64,8 @@ const SendModal: React.FC<SendModalProps> = ({
     const value = e.target.value;
     setRecipientAddress(value);
     if (value && amount) {
-      validateWalletAddress(value) && validateAmount(amount);
+      validateWalletAddress(value);
+      validateAmount(amount);
     } else {
       setError("");
     }
@@ -74,7 +75,8 @@ const SendModal: React.FC<SendModalProps> = ({
     const value = e.target.value;
     setAmount(value);
     if (value && recipientAddress) {
-      validateAmount(value) && validateWalletAddress(recipientAddress);
+      validateAmount(value);
+      validateWalletAddress(recipientAddress);
     } else {
       setError("");
     }
@@ -83,8 +85,8 @@ const SendModal: React.FC<SendModalProps> = ({
   const handleQuickAmount = (quickAmount: number) => {
     setAmount(quickAmount.toString());
     if (recipientAddress) {
-      validateAmount(quickAmount.toString()) &&
-        validateWalletAddress(recipientAddress);
+      validateAmount(quickAmount.toString());
+      validateWalletAddress(recipientAddress);
     }
   };
 
@@ -108,7 +110,7 @@ const SendModal: React.FC<SendModalProps> = ({
         setSuccess(false);
         setIsLoading(false);
       }, 1500);
-    } catch (err) {
+    } catch {
       setError("Transfer failed. Please try again.");
       setIsLoading(false);
     }

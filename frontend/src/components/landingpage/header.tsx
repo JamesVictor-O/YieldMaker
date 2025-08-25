@@ -3,11 +3,10 @@
 import React from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import { formatAddress } from "@/utils";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Header = () => {
-  const { address, isConnected } = useAccount();
+  const {} = useAccount();
 
   return (
     <div>
