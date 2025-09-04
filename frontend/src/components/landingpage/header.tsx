@@ -2,15 +2,31 @@
 
 import React from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { usePrivy } from "@privy-io/react-auth";
 
 const Header = () => {
-  const {} = useAccount();
+  const { ready, authenticated, user, login, logout } = usePrivy();
+
+  type MinimalWallet = { address?: string };
+  type MinimalLinkedAccount = { type?: string; address?: string };
+
+  const getDisplayAddress = (): string | undefined => {
+    const embeddedAddress = (user?.wallet as MinimalWallet | undefined)
+      ?.address;
+    const linkedAddress = (
+      user?.linkedAccounts as MinimalLinkedAccount[] | undefined
+    )?.find((account) => account?.type === "wallet")?.address;
+    const address = embeddedAddress || linkedAddress;
+    if (!address) return undefined;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const isConnected = ready && authenticated;
+  const displayAddress = getDisplayAddress();
 
   return (
     <div>
-      <header className="fixed top-0 w-full  backdrop-blur-sm shadow-2xl border-b border-gray-600 z-50 transition-all duration-300">
+      <header className="fixed top-0 w-full bg-white  boarder-shadow-2xl  shadow-2xl  border-gray-600 z-40 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -50,43 +66,20 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center space-x-4">
-          
-
               <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-8 py-2 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg ml-5">
-                <ConnectButton.Custom>
-                  {({
-                    account,
-                    openAccountModal,
-                    openConnectModal,
-                    mounted,
-                  }) => {
-                    const connected = mounted && account;
-
-                    return (
-                      <div>
-                        {connected ? (
-                          <button
-                            onClick={openAccountModal}
-                            className="flex items-center"
-                          >
-                            <span className="text-white font-medium">
-                              {account.displayName}
-                            </span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={openConnectModal}
-                            className="flex items-center"
-                          >
-                            <span className="text-white font-medium">
-                              Connect Wallet
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    );
-                  }}
-                </ConnectButton.Custom>
+                {isConnected ? (
+                  <button onClick={logout} className="flex items-center">
+                    <span className="text-white font-medium">
+                      {displayAddress ?? "Account"}
+                    </span>
+                  </button>
+                ) : (
+                  <button onClick={login} className="flex items-center">
+                    <span className="text-white font-medium">
+                      Connect Wallet
+                    </span>
+                  </button>
+                )}
               </div>
 
               <button className="md:hidden p-2">
@@ -130,35 +123,20 @@ const Header = () => {
             >
               Safety
             </a>
-            <ConnectButton.Custom>
-              {({ account, openAccountModal, openConnectModal, mounted }) => {
-                const connected = mounted && account;
 
-                return (
-                  <div>
-                    {connected ? (
-                      <button
-                        onClick={openAccountModal}
-                        className="flex items-center"
-                      >
-                        <span className="text-white font-medium">
-                          {account.displayName}
-                        </span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={openConnectModal}
-                        className="flex items-center"
-                      >
-                        <span className="text-white font-medium">
-                          Connect Wallet
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                );
-              }}
-            </ConnectButton.Custom>
+            <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-8 py-2 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg">
+              {isConnected ? (
+                <button onClick={logout} className="flex items-center">
+                  <span className="text-white font-medium">
+                    {displayAddress ?? "Account"}
+                  </span>
+                </button>
+              ) : (
+                <button onClick={login} className="flex items-center">
+                  <span className="text-white font-medium">Connect Wallet</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
