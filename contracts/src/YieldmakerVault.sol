@@ -32,8 +32,20 @@ contract YieldmakerVault is ERC4626, Ownable {
 
     function setStrategy(address _newStrategy) external onlyOwner {
         require(_newStrategy != address(0), "Invalid strategy");
+        // Withdraw all assets from current strategy
+        uint256 assetsToMove = strategy.totalAssets();
+        if (assetsToMove > 0) {
+            strategy.withdraw(assetsToMove);
+        }
+        // Switch to new strategy
         strategy = IStrategy(_newStrategy);
         emit StrategyUpdated(_newStrategy);
+        // Invest all assets in new strategy
+        uint256 vaultBalance = IERC20(asset()).balanceOf(address(this));
+        if (vaultBalance > 0) {
+            IERC20(asset()).approve(_newStrategy, vaultBalance);
+            strategy.invest(vaultBalance);
+        }
     }
 
     function pause() external onlyOwner {
