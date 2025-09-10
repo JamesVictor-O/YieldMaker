@@ -1,15 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 import MainDashboard from "@/components/Dashboard/MainDashboard";
 import { User } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
-  const { address, isConnected } = useAccount();
+  const { ready, authenticated, user: privyUser, login } = usePrivy();
   const [user, setUser] = useState<User | null>(null);
+
+  type MinimalWallet = { address?: string };
+  type MinimalLinkedAccount = { type?: string; address?: string };
+
+  const getWalletAddress = (): string | undefined => {
+    const embeddedAddress = (privyUser?.wallet as MinimalWallet | undefined)
+      ?.address;
+    const linkedAddress = (
+      privyUser?.linkedAccounts as MinimalLinkedAccount[] | undefined
+    )?.find((account) => account?.type === "wallet")?.address;
+    return embeddedAddress || linkedAddress;
+  };
+
+  const isConnected = ready && authenticated;
+  const address = getWalletAddress();
 
   useEffect(() => {
     if (isConnected && address) {
@@ -36,7 +51,7 @@ export default function DashboardPage() {
               Please connect your wallet to access the dashboard
             </p>
             <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-            <Button variant="outline" className="w-full">
+            <Button onClick={login} className="w-full">
               Connect Wallet
             </Button>
           </CardContent>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { usePrivy } from "@privy-io/react-auth";
 import {
   BarChart3,
   MessageSquare,
@@ -25,6 +25,24 @@ const navigation = [
 export default function AppNavigation() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { ready, authenticated, user, login, logout } = usePrivy();
+
+  type MinimalWallet = { address?: string };
+  type MinimalLinkedAccount = { type?: string; address?: string };
+
+  const getDisplayAddress = (): string | undefined => {
+    const embeddedAddress = (user?.wallet as MinimalWallet | undefined)
+      ?.address;
+    const linkedAddress = (
+      user?.linkedAccounts as MinimalLinkedAccount[] | undefined
+    )?.find((account) => account?.type === "wallet")?.address;
+    const address = embeddedAddress || linkedAddress;
+    if (!address) return undefined;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const isConnected = ready && authenticated;
+  const displayAddress = getDisplayAddress();
 
   return (
     <>
@@ -74,8 +92,6 @@ export default function AppNavigation() {
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col ">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 pt-20">
-       
-
           <nav className="flex-1 p-6 space-y-2">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
@@ -95,7 +111,6 @@ export default function AppNavigation() {
               );
             })}
           </nav>
-
         </div>
       </div>
 
@@ -114,7 +129,19 @@ export default function AppNavigation() {
             </div>
             <span className="text-lg font-bold text-gray-900">Yieldmaker</span>
           </Link>
-          <ConnectButton />
+          <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-4 py-1.5 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg">
+            {isConnected ? (
+              <button onClick={logout} className="flex items-center">
+                <span className="text-white font-medium text-sm">
+                  {displayAddress ?? "Account"}
+                </span>
+              </button>
+            ) : (
+              <button onClick={login} className="flex items-center">
+                <span className="text-white font-medium text-sm">Connect</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

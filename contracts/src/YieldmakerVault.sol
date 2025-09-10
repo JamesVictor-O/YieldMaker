@@ -12,26 +12,23 @@ contract YieldmakerVault is ERC4626, Ownable {
     bool public paused;
 
     // events
-     event StrategyUpdated(address indexed newStrategy);
+    event StrategyUpdated(address indexed newStrategy);
     event Paused(address account);
     event Unpaused(address account);
 
     // constructor
 
-    constructor(IERC20 _asset, address _strategy) 
-         ERC4626(_asset)
-        ERC20("Yieldmaker USDC", "yUSDC")
-        Ownable(msg.sender){
-            strategy = IStrategy(_strategy);
-
-        }
-
+    constructor(
+        IERC20 _asset,
+        address _strategy
+    ) ERC4626(_asset) ERC20("Yieldmaker USDC", "yUSDC") Ownable(msg.sender) {
+        strategy = IStrategy(_strategy);
+    }
 
     modifier whenNotPaused() {
         require(!paused, "Vault is paused");
         _;
     }
-    
 
     function setStrategy(address _newStrategy) external onlyOwner {
         require(_newStrategy != address(0), "Invalid strategy");
@@ -53,24 +50,21 @@ contract YieldmakerVault is ERC4626, Ownable {
         return strategy.totalAssets();
     }
 
-    function deposit(uint256 assets, address receiver)
-        public
-        override
-        whenNotPaused
-        returns (uint256)
-    {
+    function deposit(
+        uint256 assets,
+        address receiver
+    ) public override whenNotPaused returns (uint256) {
         uint256 shares = super.deposit(assets, receiver);
         IERC20(asset()).approve(address(strategy), assets);
         strategy.invest(assets);
         return shares;
     }
 
-    function withdraw(uint256 assets, address receiver, address owner)
-        public
-        override
-        whenNotPaused
-        returns (uint256)
-    {
+    function withdraw(
+        uint256 assets,
+        address receiver,
+        address owner
+    ) public override whenNotPaused returns (uint256) {
         strategy.withdraw(assets);
         return super.withdraw(assets, receiver, owner);
     }
@@ -79,6 +73,4 @@ contract YieldmakerVault is ERC4626, Ownable {
         strategy.emergencyWithdraw();
         paused = true;
     }
-
-
 }
