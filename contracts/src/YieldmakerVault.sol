@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -16,8 +17,7 @@ contract YieldmakerVault is ERC4626, Ownable {
     event Paused(address account);
     event Unpaused(address account);
 
-    // constructor
-
+    // constructor 
     constructor(
         IERC20 _asset,
         address _strategy
@@ -30,32 +30,12 @@ contract YieldmakerVault is ERC4626, Ownable {
         _;
     }
 
-    // function setStrategy(address _newStrategy) external onlyOwner {
-    //     require(_newStrategy != address(0), "Invalid strategy");
-
-    //     uint256 assetsToMove = strategy.totalAssets();
-    //     if (assetsToMove > 0) {
-    //         strategy.withdraw(assetsToMove);
-    //     }
-
-    //     strategy = IStrategy(_newStrategy);
-    //     emit StrategyUpdated(_newStrategy);
-
-    //     uint256 vaultBalance = IERC20(asset()).balanceOf(address(this));
-    //     if (vaultBalance > 0) {
-    //         IERC20(asset()).approve(_newStrategy, vaultBalance);
-    //         strategy.invest(vaultBalance);
-    //     }
-    // }
-
     function setStrategy(address _newStrategy) external onlyOwner {
         require(_newStrategy != address(0), "Invalid strategy");
 
-        if (address(strategy) != address(0)) {
-            uint256 assetsToMove = strategy.totalAssets();
-            if (assetsToMove > 0) {
-                strategy.withdraw(assetsToMove);
-            }
+        uint256 assetsToMove = strategy.totalAssets();
+        if (assetsToMove > 0) {
+            strategy.withdraw(assetsToMove);
         }
 
         strategy = IStrategy(_newStrategy);
@@ -63,11 +43,11 @@ contract YieldmakerVault is ERC4626, Ownable {
 
         uint256 vaultBalance = IERC20(asset()).balanceOf(address(this));
         if (vaultBalance > 0) {
-            IERC20(asset()).approve(_newStrategy, vaultBalance);
+            IERC20(asset()).transfer(address(strategy), vaultBalance);
             strategy.invest(vaultBalance);
         }
     }
-
+        
     function pause() external onlyOwner {
         paused = true;
         emit Paused(msg.sender);
@@ -87,8 +67,11 @@ contract YieldmakerVault is ERC4626, Ownable {
         address receiver
     ) public override whenNotPaused returns (uint256) {
         uint256 shares = super.deposit(assets, receiver);
-        IERC20(asset()).approve(address(strategy), assets);
+        
+        // Transfer the assets from vault to strategy, then invest
+        IERC20(asset()).transfer(address(strategy), assets);
         strategy.invest(assets);
+        
         return shares;
     }
 
