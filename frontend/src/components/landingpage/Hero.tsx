@@ -3,52 +3,54 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Footer from "./footer";
+import Image from "next/image";
 
 const HeroSection = () => {
   return (
     <div className="">
       {/* Hero Section */}
-      <section className="pt-30 pb-8 sm:pt-20 sm:pb-12 lg:pt-28 lg:pb-16 min-h-screen flex flex-col md:h-screen overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center">
+      <section
+        className="relative pt-30 pb-8 sm:pt-10 sm:pb-12 lg:pt-10 lg:pb-16 h-screen flex flex-col md:h-screen overflow-hidden"
+        style={{
+          backgroundImage: "url('/landingpage.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center z-10">
           <div className="text-center font-nunito">
-            
             {/* Main Heading - Mobile Optimized */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-dark mb-4 sm:mb-6 animate-slide-up leading-tight">
-              Unlock DeFi Profits with{" "}
-              <span className="">AI Simplicity</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-300 mb-4 sm:mb-6 animate-slide-up leading-tight">
+              Unlock DeFi Profits with <span className="">AI Simplicity</span>
             </h1>
 
-            {/* Subtitle - Mobile Optimized */}
-            {/* <p className="text-base sm:text-lg lg:text-xl text-text-light mb-6 sm:mb-8 font-Roboto max-w-xs sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed animate-slide-up px-2 sm:px-0">
-              From everyday{" "}
-              <span className="font-semibold text-[#00DBDD]">Savers</span> to
-              everyday{" "}
-              <span className="font-semibold text-[#00DBDD]">Earners</span>,
-              Yieldmaker&apos;s AI guides you to safe, high-yield DeFi
-              opportunities with simple conversations—no crypto expertise needed.
-            </p> */}
-
-            <p className="text-base sm:text-lg lg:text-xl text-text-light mb-6 sm:mb-8 font-Roboto max-w-xs sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed animate-slide-up px-2 sm:px-0">
+            <p className="text-base sm:text-lg lg:text-xl text-white mb-6 sm:mb-8 font-Roboto max-w-xs sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed animate-slide-up px-2 sm:px-0">
               Just Bring The{" "}
               <span className="font-semibold text-[#00DBDD]">Savers</span> to
               everyday{" "}
               <span className="font-semibold text-[#00DBDD]">Earners</span>,
               Yieldmaker&apos;s AI guides you to safe, high-yield DeFi
-              opportunities with simple conversations—no crypto expertise needed.
+              opportunities with simple conversations—no crypto expertise
+              needed.
             </p>
 
+            {/* <div>
+              <Image src={"/lending.svg"}  width={500} height={500} alt="image"/>
+            </div> */}
 
             {/* CTA Buttons - Mobile Stack */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 animate-slide-up px-4 sm:px-0">
               <Button
                 asChild
-                className="bg-[#00DBDD] text-white px-6 sm:px-8 py-3 sm:py-4 md:rounded-full text-base sm:text-lg font-semibold hover:bg-[#03a8ab] transition-all duration-200 transform hover:scale-105 w-full sm:w-auto max-w-xs sm:max-w-none shadow-lg"
+                className="bg-[#00DBDD] text-white px-6 sm:px-8 py-3 sm:py-4 md:rounded text-base sm:text-lg font-semibold hover:bg-[#03a8ab] transition-all duration-200 transform hover:scale-105 w-full sm:w-auto max-w-xs sm:max-w-none shadow-lg"
               >
                 <a href="/dashboard">Start Earning Now</a>
               </Button>
               <Button
                 variant="outline"
-                className="text-primary-blue border-2 border-primary-blue px-6 sm:px-8 py-3 sm:py-4 md:rounded-full text-base sm:text-lg font-semibold hover:bg-light-blue transition-all duration-200 w-full sm:w-auto max-w-xs sm:max-w-none"
+                className="text-primary-blue border-2 border-primary-blue px-6 sm:px-8 py-3 sm:py-4 md:rounded text-base sm:text-lg font-semibold hover:bg-light-blue transition-all duration-200 w-full sm:w-auto max-w-xs sm:max-w-none"
               >
                 Watch Demo
               </Button>
@@ -56,7 +58,7 @@ const HeroSection = () => {
           </div>
 
           {/* Demo Chat Interface - Mobile Optimized */}
-          <div className="mt-8 sm:mt-12 lg:mt-16 relative animate-float px-2 sm:px-0">
+          {/* <div className="mt-8 sm:mt-12 lg:mt-16 relative animate-float px-2 sm:px-0">
             <Card className="max-w-sm sm:max-w-2xl lg:max-w-4xl mx-auto bg-[#1A1A1A] border border-gray-200 rounded-xl sm:rounded-2xl overflow-hidden">
               <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6">
                 <div className="flex items-center space-x-2 sm:space-x-3">
@@ -71,7 +73,7 @@ const HeroSection = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-6 pb-4 sm:pb-6">
-                {/* User Message */}
+               
                 <div className="flex justify-start">
                   <div className="bg-light-blue text-white px-3 sm:px-4 py-2 rounded-2xl rounded-bl-sm max-w-[85%] sm:max-w-xs">
                     <p className="text-xs sm:text-sm">
@@ -81,7 +83,7 @@ const HeroSection = () => {
                   </div>
                 </div>
                 
-                {/* AI Response */}
+               
                 <div className="flex justify-end">
                   <div className="bg-primary-blue text-white px-3 sm:px-4 py-2 rounded-2xl rounded-br-sm max-w-[85%] sm:max-w-xs">
                     <p className="text-xs sm:text-sm">
@@ -92,7 +94,7 @@ const HeroSection = () => {
                   </div>
                 </div>
                 
-                {/* Success Badge */}
+                
                 <div className="flex justify-center pt-2">
                   <Badge className="bg-accent-green text-white px-3 sm:px-6 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
                     ✓ Deposit Successful - Earning 8.2% APY
@@ -100,14 +102,14 @@ const HeroSection = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </section>
 
       {/* Features Section - Mobile Optimized */}
-      <section id="features" className="py-12 sm:py-16 lg:py-20 bg-[#0e0d0d]">
+      {/* <section id="features" className="py-12 sm:py-16 lg:py-20 bg-[#0e0d0d]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
+        
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-2">
               Why Choose{" "}
@@ -119,10 +121,9 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Features Grid - Mobile Stack */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 px-2 sm:px-0">
             
-            {/* Feature 1 */}
+           
             <Card className="bg-[#1A1A1A] border border-gray-800 hover:border-[#00DBDD] transition-all duration-300 transform hover:scale-105 rounded-xl">
               <CardHeader className="pb-3 sm:pb-4">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00DBDD] rounded-lg flex items-center justify-center mb-3 sm:mb-4">
@@ -152,7 +153,7 @@ const HeroSection = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 2 */}
+          
             <Card className="bg-[#1A1A1A] border border-gray-800 hover:border-[#00DBDD] transition-all duration-300 transform hover:scale-105 rounded-xl">
               <CardHeader className="pb-3 sm:pb-4">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00DBDD] rounded-lg flex items-center justify-center mb-3 sm:mb-4">
@@ -182,7 +183,7 @@ const HeroSection = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 3 */}
+            
             <Card className="bg-[#1A1A1A] border border-gray-800 hover:border-[#00DBDD] transition-all duration-300 transform hover:scale-105 rounded-xl sm:col-span-2 lg:col-span-1">
               <CardHeader className="pb-3 sm:pb-4">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00DBDD] rounded-lg flex items-center justify-center mb-3 sm:mb-4">
@@ -213,9 +214,9 @@ const HeroSection = () => {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

@@ -31,7 +31,7 @@ const Header = () => {
 
   return (
     <div>
-      <header className="fixed top-0 w-full bg-white z-40 transition-all duration-300 shadow-sm md:shadow-none">
+      <header className="fixed top-0 w-full z-40 transition-all duration-300 shadow-sm md:shadow-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo Section */}
@@ -45,7 +45,7 @@ const Header = () => {
                   className="bg-transparent"
                 />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-text-dark">
+              <span className="text-lg sm:text-xl font-bold text-white">
                 Yieldmaker
               </span>
             </div>
@@ -54,19 +54,19 @@ const Header = () => {
             <nav className="hidden md:flex space-x-8">
               <a
                 href="#features"
-                className="text-text-light hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
               >
                 Features
               </a>
               <a
                 href="#how-it-works"
-                className="text-text-light hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
               >
                 How it Works
               </a>
               <a
                 href="#safety"
-                className="text-text-light hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
               >
                 Safety
               </a>
