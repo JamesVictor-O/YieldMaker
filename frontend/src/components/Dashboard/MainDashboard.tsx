@@ -39,17 +39,17 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ user }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6  ">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+      <div className="grid grid-cols-3 md:grid-cols-3 md:gap-6">
+        <Card className="mx-0">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">
               Total Portfolio
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-sm  md:text-2xl font-bold text-gray-900">
               ${userBalance.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">Current balance</p>
@@ -76,10 +76,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ user }) => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold text-gray-900 capitalize">
+              <p className="text-2xl font-bold text-gray-900 capitalize hidden md:block">
                 {user.riskProfile || "Not Set"}
               </p>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="md:text-xs">
                 {user.riskProfile === "conservative"
                   ? "Low"
                   : user.riskProfile === "moderate"
