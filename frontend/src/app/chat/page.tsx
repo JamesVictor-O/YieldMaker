@@ -1,14 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 import AIChat from "@/components/Chat/AIChat";
 import { User } from "@/types";
 import ConnectWallet from "@/components/Web3/ConnectWallet";
 
 export default function ChatPage() {
-  const { address, isConnected } = useAccount();
+   const { ready, authenticated, user: privyUser, login } = usePrivy();
   const [user, setUser] = useState<User | null>(null);
+
+    type MinimalWallet = { address?: string };
+  type MinimalLinkedAccount = { type?: string; address?: string };
+
+  const getWalletAddress = (): string | undefined => {
+    const embeddedAddress = (privyUser?.wallet as MinimalWallet | undefined)
+      ?.address;
+    const linkedAddress = (
+      privyUser?.linkedAccounts as MinimalLinkedAccount[] | undefined
+    )?.find((account) => account?.type === "wallet")?.address;
+    return embeddedAddress || linkedAddress;
+  };
+
+  const isConnected = ready && authenticated;
+  const address = getWalletAddress();
 
   useEffect(() => {
     if (isConnected && address) {

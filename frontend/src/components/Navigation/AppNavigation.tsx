@@ -91,7 +91,7 @@ export default function AppNavigation() {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col ">
-        <div className="flex flex-col flex-grow bg-black border-r border-[#000000] pt-20">
+        <div className="flex flex-col flex-grow bg-black border-r border-[#212020] pt-20">
           <nav className="flex-1 p-6 space-y-2">
             {navigation.map((item) => {
               const isActive = pathname === item.href;

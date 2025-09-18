@@ -135,7 +135,7 @@ const SendModal: React.FC<SendModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg p-2 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
@@ -150,7 +150,7 @@ const SendModal: React.FC<SendModalProps> = ({
 
         <div className="space-y-4">
           {/* Current Balance */}
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-gray-50 rounded-lg p-3 text-center sm:text-left">
             <p className="text-sm text-gray-500">Available Balance</p>
             <p className="text-lg font-semibold text-gray-900">
               ${currentBalance.toLocaleString()}
@@ -167,7 +167,7 @@ const SendModal: React.FC<SendModalProps> = ({
               value={recipientAddress}
               onChange={handleAddressChange}
               disabled={isLoading}
-              className="font-mono text-sm"
+              className="font-mono text-sm w-full"
             />
             {recipientAddress && (
               <p className="text-xs text-gray-500">
@@ -189,7 +189,7 @@ const SendModal: React.FC<SendModalProps> = ({
                 placeholder="0.00"
                 value={amount}
                 onChange={handleAmountChange}
-                className="pl-8"
+                className="pl-8 w-full"
                 disabled={isLoading}
                 min="0"
                 max={currentBalance}
@@ -202,7 +202,7 @@ const SendModal: React.FC<SendModalProps> = ({
           {/* Quick Amount Buttons */}
           <div className="space-y-2">
             <Label className="text-sm text-gray-500">Quick Amount</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[50, 100, 250, 500, 1000, 2500].map((quickAmount) => (
                 <Button
                   key={quickAmount}
@@ -210,7 +210,7 @@ const SendModal: React.FC<SendModalProps> = ({
                   size="sm"
                   onClick={() => handleQuickAmount(quickAmount)}
                   disabled={isLoading}
-                  className="text-xs"
+                  className="text-xs w-full"
                 >
                   ${quickAmount.toLocaleString()}
                 </Button>
@@ -282,14 +282,19 @@ const SendModal: React.FC<SendModalProps> = ({
           )}
         </div>
 
-        <DialogFooter className="flex gap-2">
-          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
+        <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 w-full">
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSend}
             disabled={!recipientAddress || !amount || isLoading || !!error}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
