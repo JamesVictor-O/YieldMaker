@@ -195,41 +195,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ user }) => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button variant="outline" className="h-12">
-              <div className="text-center">
-                <div className="text-lg">💰</div>
-                <div className="text-xs">Deposit</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-12">
-              <div className="text-center">
-                <div className="text-lg">📊</div>
-                <div className="text-xs">Analytics</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-12">
-              <div className="text-center">
-                <div className="text-lg">⚙️</div>
-                <div className="text-xs">Settings</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-12">
-              <div className="text-center">
-                <div className="text-lg">📈</div>
-                <div className="text-xs">Portfolio</div>
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
