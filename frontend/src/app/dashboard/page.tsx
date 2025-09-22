@@ -79,8 +79,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#141414] p-4">
-      <div className="max-w-7xl mx-auto mt-20">
+    <div className=" bg-gray-950 p-4">
+      <div className="max-w-7xl mx-auto mc">
         <MainDashboard user={user} />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import {useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { CONTRACT_ADDRESSES } from '@/contracts/addresses';
 import YieldmakerVaultABI from '@/contracts/abis/YieldmakerVault.json';
@@ -148,4 +148,35 @@ export function useEmergencyWithdraw() {
     isConfirmed,
     error,
   };
+}
+
+
+
+export function useVaultBalance() {
+  const { address } = useAccount();
+  const { data: balance, isLoading, error } = useReadContract({
+    address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
+    abi: YieldmakerVaultABI,
+    functionName: 'balanceOf',
+    args: [address],
+    watch: true,
+  });
+  return { balance, isLoading, error };
+}
+
+export function useVaultSend() {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
+  const send = async (to: string, amount: string) => {
+    const shares = parseEther(amount);
+    writeContract({
+      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
+      abi: YieldmakerVaultABI,
+      functionName: 'transfer',
+      args: [to, shares],
+    });
+  };
+
+  return { send, hash, isPending, isConfirming, isConfirmed, error };
 }
