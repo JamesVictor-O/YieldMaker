@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
+import Image from "next/image";
 import {
   BarChart3,
   MessageSquare,
@@ -12,6 +13,8 @@ import {
   X,
   TrendingUp,
   Shield,
+  Wallet,
+  LogOut,
 } from "lucide-react";
 
 const navigation = [
@@ -46,108 +49,218 @@ export default function AppNavigation() {
 
   return (
     <>
-      {/* Mobile sidebar */}
+      {/* Mobile sidebar backdrop */}
       <div
-        className={`fixed inset-0 z-50 lg:hidden ${
-          sidebarOpen ? "block" : "hidden"
+        className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
         <div
-          className="fixed inset-0 bg-gray-900/80"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="text-xl font-bold text-gray-900">Yieldmaker</h1>
+        
+        {/* Mobile sidebar */}
+        <div className={`fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}>
+          {/* Mobile sidebar header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg">
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={24}
+                  height={24}
+                  className="bg-transparent"
+                />
+              </div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Yieldmaker
+              </h1>
+            </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg hover:bg-gray-100"
+              className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors duration-200"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-gray-300" />
             </button>
           </div>
-          <nav className="p-4 space-y-2">
+          
+          {/* Mobile navigation */}
+          <nav className="p-6 space-y-3">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  className={`group flex items-center space-x-4 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-white shadow-lg"
+                      : "text-gray-300 hover:bg-gray-700/30 hover:text-white"
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
+                  <item.icon className={`w-5 h-5 transition-colors ${
+                    isActive ? "text-cyan-400" : "text-gray-400 group-hover:text-cyan-400"
+                  }`} />
+                  <span className="font-medium">{item.name}</span>
+                  {isActive && (
+                    <div className="ml-auto w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                  )}
                 </Link>
               );
             })}
           </nav>
+
+          {/* Mobile wallet section */}
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl p-4 border border-gray-600/30">
+              {isConnected ? (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <Wallet className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">
+                        {displayAddress ?? "Connected"}
+                      </p>
+                      <p className="text-xs text-gray-400">Wallet Connected</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center justify-center space-x-2 w-full py-2 px-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors duration-200"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Disconnect</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={login}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg"
+                >
+                  Connect Wallet
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col ">
-        <div className="flex flex-col flex-grow bg-black border-r border-[#212020] pt-20">
-          <nav className="flex-1 p-6 space-y-2">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-gradient-to-b from-gray-900 via-black to-gray-900 border-r border-gray-800/50 shadow-2xl">
+          {/* Desktop logo */}
+          <div className="flex items-center space-x-3 p-6 border-b border-gray-800/50">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg">
+              <Image
+                src="/Logo.png"
+                alt="Logo"
+                width={24}
+                height={24}
+                className="bg-transparent"
+              />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Yieldmaker
+            </span>
+          </div>
+          
+          {/* Desktop navigation */}
+          <nav className="flex-1 p-6 space-y-3">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  className={`group flex items-center space-x-4 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? "bg-[#0c0b0b] text-gray-200"
-                      : "text-white hover:bg-[#171515]"
+                      ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-white shadow-lg"
+                      : "text-gray-300 hover:bg-gray-800/40 hover:text-white"
                   }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
+                  <item.icon className={`w-5 h-5 transition-colors ${
+                    isActive ? "text-cyan-400" : "text-gray-400 group-hover:text-cyan-400"
+                  }`} />
+                  <span className="font-medium">{item.name}</span>
+                  {isActive && (
+                    <div className="ml-auto w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                  )}
                 </Link>
               );
             })}
           </nav>
-        </div>
-      </div>
 
-      {/* Top bar for mobile */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between px-4 py-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-white" />
+          {/* Desktop wallet section */}
+          <div className="p-6 border-t border-gray-800/50">
+            <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl p-4 border border-gray-600/30">
+              {isConnected ? (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <Wallet className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">
+                        {displayAddress ?? "Connected"}
+                      </p>
+                      <p className="text-xs text-gray-400">Wallet Connected</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center justify-center space-x-2 w-full py-2 px-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors duration-200"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Disconnect</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={login}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg"
+                >
+                  Connect Wallet
+                </button>
+              )}
             </div>
-            <span className="text-lg font-bold text-gray-900">Yieldmaker</span>
-          </Link>
-          <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-4 py-1.5 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg">
-            {isConnected ? (
-              <button onClick={logout} className="flex items-center">
-                <span className="text-white font-medium text-sm">
-                  {displayAddress ?? "Account"}
-                </span>
-              </button>
-            ) : (
-              <button onClick={login} className="flex items-center">
-                <span className="text-white font-medium text-sm">Connect</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Main content wrapper */}
-      <div className="lg:pl-64">
-        <div className="lg:hidden h-16" /> {/* Spacer for mobile top bar */}
+      {/* Mobile top bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-lg">
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-xl hover:bg-gray-100/80 transition-colors duration-200"
+          >
+            <Menu className="w-5 h-5 text-gray-700" />
+          </button>
+          
+      
+          <div className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg">
+            {isConnected ? (
+              <button onClick={logout} className="flex items-center space-x-2">
+                <Wallet className="w-4 h-4" />
+                <span className="font-medium text-sm">
+                  {displayAddress ?? "Account"}
+                </span>
+              </button>
+            ) : (
+              <button onClick={login} className="flex items-center space-x-2">
+                <Wallet className="w-4 h-4" />
+                <span className="font-medium text-sm">Connect</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );
