@@ -1,9 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+
 import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import Footer from "./footer";
-import Image from "next/image";
 
 const HeroSection = () => {
   return (

@@ -1,9 +1,9 @@
 import React, { useRef, useEffect } from "react";
 import { User } from "../../types";
-import { Card } from "../ui/card";
+
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
+
 import { getStatusColor } from "../../types/investment";
 import { useInvestmentData } from "../../hooks/useInvestmentData";
 

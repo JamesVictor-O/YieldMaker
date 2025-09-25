@@ -63,7 +63,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
 
   // Get user's cUSD balance
   const {
-    balance: userTokenBalance,
+   
     formatted: formattedBalance,
     refetch: refetchBalance,
   } = useUserTokenBalance(CONTRACT_ADDRESSES.CUSD, address);
@@ -71,7 +71,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
   // Check current allowance
   const {
     allowance,
-    formatted: formattedAllowance,
+   
     refetch: refetchAllowance,
   } = useTokenAllowance(
     CONTRACT_ADDRESSES.CUSD,

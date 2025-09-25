@@ -3,12 +3,10 @@ import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { User } from "../../types";
 import InvestmentChat from "../Chat/InvestmentChat";
-import { CardHeader, CardTitle } from "../ui/card";
 import WelcomeFlow from "./WelcomeFlow";
 import FundsManagement from "./FundsManagement";
 import { useVaultBalance, useVaultInfo } from "@/hooks/contracts/useVault";
 import { useAvailableStrategies } from "@/hooks/contracts/useStrategies";
-import { Button } from "../ui/button";
 import { useInvestmentData } from "../../hooks/useInvestmentData";
 
 interface MainDashboardProps {

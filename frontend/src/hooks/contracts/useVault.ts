@@ -4,14 +4,10 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { parseEther, formatEther } from "viem";
+import { parseEther } from "viem";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import YieldmakerVaultABI from "@/contracts/abis/YieldmakerVault.json";
-import type {
-  VaultInfo,
-  DepositParams,
-  WithdrawParams,
-} from "@/contracts/types";
+import type { VaultInfo } from "@/contracts/types";
 
 // Hook for reading vault information
 export function useVaultInfo() {
