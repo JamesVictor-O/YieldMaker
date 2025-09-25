@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import {
-  InvestmentData,
   mockInvestmentData,
   calculateTotalInvested,
   calculateTotalEarned,

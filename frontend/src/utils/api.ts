@@ -40,7 +40,7 @@ export async function getUserProfile(walletAddress: string) {
 // Utility to update user preferences (backend only)
 export async function updateUserPreferences(
   walletAddress: string,
-  preferences: Record<string, any>
+  preferences: Record<string, unknown>
 ) {
   const res = await fetch("/api/user/preferences", {
     method: "PUT",

@@ -1,9 +1,6 @@
 import { useReadContract } from "wagmi";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import AaveStrategyABI from "@/contracts/abis/AaveStrategy.json";
-import CompoundStrategyABI from "@/contracts/abis/CompoundStrategy.json";
-import YearnStrategyABI from "@/contracts/abis/YearnStrategy.json";
-import UniswapV3StrategyABI from "@/contracts/abis/UniswapV3Strategy.json";
 import type { StrategyInfo, StrategyConfig } from "@/contracts/types";
 
 // Hook for reading strategy information

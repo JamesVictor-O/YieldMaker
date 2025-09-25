@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { Separator } from "../ui/separator";
 import WithdrawModal from "./modals/WithdrawModal";
 import SendModal from "./modals/SendModal";
 import DepositModal from "./modals/DepositModal";
