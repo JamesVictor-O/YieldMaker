@@ -31,96 +31,92 @@ const Header = () => {
 
   return (
     <div>
-      <header className="fixed top-0 w-full z-40 transition-all duration-300 shadow-sm md:shadow-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo Section */}
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+      <header className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800/50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Logo Section - Mobile Optimized */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
                 <Image
                   src="/Logo.png"
                   alt="Logo"
-                  width={32}
-                  height={32}
+                  width={20}
+                  height={20}
                   className="bg-transparent"
                 />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-white">
-                Yieldmaker
+              <span className="text-base sm:text-lg font-bold text-white">
+                YieldMaker
               </span>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-6 lg:space-x-8">
               <a
                 href="#features"
-                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
               >
                 Features
               </a>
               <a
                 href="#how-it-works"
-                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
               >
                 How it Works
               </a>
               <a
                 href="#safety"
-                className="text-gray-300 hover:text-primary-blue transition-colors duration-200"
+                className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
               >
                 Safety
               </a>
             </nav>
 
-            {/* Desktop Wallet Button & Mobile Menu Button */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Desktop Wallet Button */}
-              <div className="hidden sm:block">
-                <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-6 lg:px-8 py-2 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg">
-                  {isConnected ? (
-                    <button onClick={logout} className="flex items-center">
-                      <span className="text-white font-medium text-sm lg:text-base">
-                        {displayAddress ?? "Account"}
-                      </span>
-                    </button>
-                  ) : (
-                    <button onClick={login} className="flex items-center">
-                      <span className="text-white font-medium text-sm lg:text-base">
-                        Connect Wallet
-                      </span>
-                    </button>
-                  )}
-                </div>
+            {/* CTA Button - Mobile First */}
+            <div className="flex items-center gap-2">
+              {/* Main CTA Button */}
+              <div className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 rounded-lg transition-all active:scale-95">
+                {isConnected ? (
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-1.5"
+                  >
+                    <div className="w-2 h-2 bg-emerald-300 rounded-full"></div>
+                    <span className="font-medium text-xs sm:text-sm">
+                      {displayAddress ?? "Account"}
+                    </span>
+                  </button>
+                ) : (
+                  <button onClick={login} className="flex items-center gap-1.5">
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    <span className="font-medium text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Start </span>Earning
+                    </span>
+                  </button>
+                )}
               </div>
 
-              {/* Mobile Wallet Button */}
-              <div className="sm:hidden">
-                <div className="bg-gradient-to-r bg-[#00DBDD] text-white px-3 py-2 rounded-lg hover:bg-[#5aaaab] transition-all shadow-lg">
-                  {isConnected ? (
-                    <button onClick={logout} className="flex items-center">
-                      <span className="text-white font-medium text-xs">
-                        {displayAddress ?? "Account"}
-                      </span>
-                    </button>
-                  ) : (
-                    <button onClick={login} className="flex items-center">
-                      <span className="text-white font-medium text-xs">
-                        Connect
-                      </span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Mobile Menu Toggle */}
-              <button 
-                className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+              {/* Mobile Menu Toggle - Only show if we have navigation */}
+              <button
+                className="md:hidden p-1.5 rounded-lg hover:bg-gray-800/50 transition-colors"
                 onClick={toggleMobileMenu}
                 aria-label="Toggle menu"
               >
                 <svg
-                  className={`w-6 h-6 text-text-dark transition-transform duration-200 ${
-                    mobileMenuOpen ? 'rotate-90' : ''
+                  className={`w-5 h-5 text-gray-300 transition-transform duration-200 ${
+                    mobileMenuOpen ? "rotate-180" : ""
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -147,32 +143,32 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - Dark Theme */}
         <div
-          className={`md:hidden bg-white border-t border-gray-100 transition-all duration-300 ease-in-out ${
-            mobileMenuOpen 
-              ? 'max-h-64 opacity-100' 
-              : 'max-h-0 opacity-0 overflow-hidden'
+          className={`md:hidden bg-gray-950/95 backdrop-blur-md border-t border-gray-800/50 transition-all duration-300 ease-in-out ${
+            mobileMenuOpen
+              ? "max-h-64 opacity-100"
+              : "max-h-0 opacity-0 overflow-hidden"
           }`}
         >
-          <div className="px-4 py-4 space-y-4">
+          <div className="px-4 py-3 space-y-1">
             <a
               href="#features"
-              className="block text-text-light hover:text-primary-blue transition-colors py-2"
+              className="block text-gray-300 hover:text-emerald-400 hover:bg-gray-800/30 transition-colors py-2.5 px-3 rounded-lg text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="block text-text-light hover:text-primary-blue transition-colors py-2"
+              className="block text-gray-300 hover:text-emerald-400 hover:bg-gray-800/30 transition-colors py-2.5 px-3 rounded-lg text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               How it Works
             </a>
             <a
               href="#safety"
-              className="block text-text-light hover:text-primary-blue transition-colors py-2"
+              className="block text-gray-300 hover:text-emerald-400 hover:bg-gray-800/30 transition-colors py-2.5 px-3 rounded-lg text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Safety

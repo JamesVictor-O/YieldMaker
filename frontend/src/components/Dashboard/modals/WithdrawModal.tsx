@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { formatEther } from "viem";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +13,7 @@ import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Badge } from "../../ui/badge";
+import { useVaultWithdraw, useVaultBalance } from "@/hooks/contracts/useVault";
 
 interface WithdrawModalProps {
   isOpen: boolean;
@@ -26,9 +29,25 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
   currentBalance,
 }) => {
   const [amount, setAmount] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const { address } = useAccount();
+
+  // Smart contract hooks
+  const {
+    withdraw,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error: withdrawError,
+  } = useVaultWithdraw();
+  const { balance: vaultBalance } = useVaultBalance();
+
+  const isLoading = isPending || isConfirming;
+  const vaultBalanceFormatted = vaultBalance
+    ? formatEther(vaultBalance as bigint)
+    : "0";
 
   const validateAmount = (value: string): boolean => {
     const numValue = parseFloat(value);
@@ -36,10 +55,19 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
       setError("Please enter a valid amount greater than 0");
       return false;
     }
-    if (numValue > currentBalance) {
-      setError("Insufficient balance for this withdrawal");
+
+    // Check against actual vault balance
+    const maxWithdraw = Math.min(
+      currentBalance,
+      parseFloat(vaultBalanceFormatted)
+    );
+    if (numValue > maxWithdraw) {
+      setError(
+        `Insufficient balance. Max withdrawal: ${maxWithdraw.toFixed(4)}`
+      );
       return false;
     }
+
     if (numValue > 50000) {
       setError("Maximum withdrawal amount is $50,000 per transaction");
       return false;
@@ -59,40 +87,58 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
   };
 
   const handleQuickAmount = (percentage: number) => {
-    const quickAmount = (currentBalance * percentage) / 100;
+    const maxWithdraw = Math.min(
+      currentBalance,
+      parseFloat(vaultBalanceFormatted)
+    );
+    const quickAmount = (maxWithdraw * percentage) / 100;
     setAmount(quickAmount.toFixed(2));
     setError("");
   };
 
   const handleWithdrawAll = () => {
-    setAmount(currentBalance.toFixed(2));
+    const maxWithdraw = Math.min(
+      currentBalance,
+      parseFloat(vaultBalanceFormatted)
+    );
+    setAmount(maxWithdraw.toFixed(2));
     setError("");
   };
 
   const handleWithdraw = async () => {
-    if (!validateAmount(amount)) {
+    if (!validateAmount(amount) || !address) {
       return;
     }
 
-    setIsLoading(true);
     setError("");
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      withdraw(amount, address, address);
+    } catch (err) {
+      setError(
+        `Withdrawal failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  };
 
+  // Handle withdrawal confirmation
+  useEffect(() => {
+    if (isConfirmed) {
       setSuccess(true);
       setTimeout(() => {
         onSuccess(parseFloat(amount));
         setAmount("");
         setSuccess(false);
-        setIsLoading(false);
       }, 1500);
-    } catch {
-      setError("Withdrawal failed. Please try again.");
-      setIsLoading(false);
     }
-  };
+  }, [isConfirmed, amount, onSuccess]);
+
+  // Handle errors
+  useEffect(() => {
+    if (withdrawError) {
+      setError(`Withdrawal failed: ${withdrawError.message}`);
+    }
+  }, [withdrawError]);
 
   const handleClose = () => {
     if (!isLoading) {

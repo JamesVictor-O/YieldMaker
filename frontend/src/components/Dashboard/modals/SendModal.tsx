@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { formatEther, isAddress } from "viem";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +13,7 @@ import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Badge } from "../../ui/badge";
+import { useVaultSend, useVaultBalance } from "@/hooks/contracts/useVault";
 
 interface SendModalProps {
   isOpen: boolean;
@@ -27,15 +30,29 @@ const SendModal: React.FC<SendModalProps> = ({
 }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const { address } = useAccount();
+
+  // Smart contract hooks
+  const {
+    send,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error: sendError,
+  } = useVaultSend();
+  const { balance: vaultBalance } = useVaultBalance();
+
+  const isLoading = isPending || isConfirming;
+  const vaultBalanceFormatted = vaultBalance
+    ? formatEther(vaultBalance as bigint)
+    : "0";
+
   const validateWalletAddress = (address: string): boolean => {
-    // Basic Ethereum address validation
-    const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-    if (!ethereumAddressRegex.test(address)) {
-      setError("Please enter a valid Ethereum wallet address");
+    if (!isAddress(address)) {
+      setError("Please enter a valid wallet address");
       return false;
     }
     setError("");
@@ -48,10 +65,14 @@ const SendModal: React.FC<SendModalProps> = ({
       setError("Please enter a valid amount greater than 0");
       return false;
     }
-    if (numValue > currentBalance) {
-      setError("Insufficient balance for this transfer");
+
+    // Check against actual vault balance
+    const maxSend = Math.min(currentBalance, parseFloat(vaultBalanceFormatted));
+    if (numValue > maxSend) {
+      setError(`Insufficient balance. Max send: ${maxSend.toFixed(4)}`);
       return false;
     }
+
     if (numValue > 25000) {
       setError("Maximum send amount is $25,000 per transaction");
       return false;
@@ -91,30 +112,44 @@ const SendModal: React.FC<SendModalProps> = ({
   };
 
   const handleSend = async () => {
-    if (!validateWalletAddress(recipientAddress) || !validateAmount(amount)) {
+    if (
+      !validateWalletAddress(recipientAddress) ||
+      !validateAmount(amount) ||
+      !address
+    ) {
       return;
     }
 
-    setIsLoading(true);
     setError("");
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      send(recipientAddress, amount);
+    } catch (err) {
+      setError(
+        `Transfer failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  };
 
+  // Handle send confirmation
+  useEffect(() => {
+    if (isConfirmed) {
       setSuccess(true);
       setTimeout(() => {
         onSuccess(parseFloat(amount));
         setRecipientAddress("");
         setAmount("");
         setSuccess(false);
-        setIsLoading(false);
       }, 1500);
-    } catch {
-      setError("Transfer failed. Please try again.");
-      setIsLoading(false);
     }
-  };
+  }, [isConfirmed, amount, onSuccess]);
+
+  // Handle errors
+  useEffect(() => {
+    if (sendError) {
+      setError(`Transfer failed: ${sendError.message}`);
+    }
+  }, [sendError]);
 
   const handleClose = () => {
     if (!isLoading) {

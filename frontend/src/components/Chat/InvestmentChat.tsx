@@ -1,96 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { User } from "../../types";
-import { Card, CardHeader, CardTitle } from "../ui/card";
+import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
-
-interface InvestmentData {
-  month: string;
-  invested: number;
-  earned: number;
-  apy: number;
-  protocol: string;
-  status: "active" | "completed" | "pending";
-}
+import { getStatusColor } from "../../types/investment";
+import { useInvestmentData } from "../../hooks/useInvestmentData";
 
 interface InvestmentChatProps {
   user: User;
 }
 
-const InvestmentChat: React.FC<InvestmentChatProps> = ({ }) => {
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+const InvestmentChat: React.FC<InvestmentChatProps> = ({}) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Mock investment data - in a real app this would come from the blockchain
-  const investmentData: InvestmentData[] = [
-    {
-      month: "January 2024",
-      invested: 5000,
-      earned: 245.5,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-    {
-      month: "February 2024",
-      invested: 7500,
-      earned: 412.3,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-    {
-      month: "March 2024",
-      invested: 10000,
-      earned: 589.75,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-    {
-      month: "April 2024",
-      invested: 12000,
-      earned: 720.4,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-    {
-      month: "May 2024",
-      invested: 15000,
-      earned: 892.15,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-    {
-      month: "June 2024",
-      invested: 18000,
-      earned: 1085.6,
-      apy: 8.2,
-      protocol: "Aave USDC",
-      status: "active",
-    },
-  ];
-
-  const filteredData =
-    selectedMonth === "all"
-      ? investmentData
-      : investmentData.filter((item) => item.month === selectedMonth);
-
-  const totalInvested = investmentData.reduce(
-    (sum, item) => sum + item.invested,
-    0
-  );
-  const totalEarned = investmentData.reduce(
-    (sum, item) => sum + item.earned,
-    0
-  );
-  const averageApy =
-    investmentData.reduce((sum, item) => sum + item.apy, 0) /
-    investmentData.length;
+  const { filteredData, statistics } = useInvestmentData();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,160 +23,105 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({ }) => {
     scrollToBottom();
   }, [filteredData]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-      case "completed":
-        return "bg-blue-500/20 text-blue-400 border border-blue-500/30";
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30";
-      default:
-        return "bg-gray-500/20 text-gray-400 border border-gray-500/30";
-    }
-  };
+  // getStatusColor is now imported from investment types
 
   return (
-    <Card className="h-full max-h-[600px] overflow-y-auto flex flex-col bg-transparent border-0">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">$</span>
-          </div>
-          <span className="text-white">Investment History</span>
-        </CardTitle>
-        <p className="text-sm text-gray-400">
-          Your monthly investment and earnings breakdown
-        </p>
-      </CardHeader>
-
-      <div className="px-6 pb-4">
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-400">Total Invested</p>
-            <p className="text-lg font-bold text-white">
-              ${totalInvested.toLocaleString()}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-400">Total Earned</p>
-            <p className="text-lg font-bold text-emerald-400">
-              ${totalEarned.toLocaleString()}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-400">Avg APY</p>
-            <p className="text-lg font-bold text-blue-400">
-              {averageApy.toFixed(1)}%
-            </p>
-          </div>
+    <div className="h-full flex flex-col space-y-4">
+      {/* Header Stats - Mobile Optimized */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 rounded-xl p-3 border border-emerald-500/20">
+          <p className="text-emerald-400 text-xs font-medium mb-1">
+            Current Month
+          </p>
+          <p className="text-white font-bold text-lg">
+            ${statistics.currentMonthData?.invested.toLocaleString() || 0}
+          </p>
+          <p className="text-gray-400 text-xs">Invested</p>
         </div>
-
-        <div className="flex gap-2 mb-4 overflow-x-auto">
-          <Button
-            variant={selectedMonth === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedMonth("all")}
-            className={selectedMonth === "all" 
-              ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500"
-              : "bg-gray-700 hover:bg-gray-600 text-gray-300 border-gray-600 hover:text-white"
-            }
-          >
-            All Months
-          </Button>
-          {investmentData.map((item) => (
-            <Button
-              key={item.month}
-              variant={selectedMonth === item.month ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedMonth(item.month)}
-              className={selectedMonth === item.month
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500"
-                : "bg-gray-700 hover:bg-gray-600 text-gray-300 border-gray-600 hover:text-white"
-              }
-            >
-              {item.month.split(" ")[0]}
-            </Button>
-          ))}
+        <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 rounded-xl p-3 border border-blue-500/20">
+          <p className="text-blue-400 text-xs font-medium mb-1">Projected</p>
+          <p className="text-white font-bold text-lg">
+            ${statistics.projectedEarnings.toFixed(2)}
+          </p>
+          <p className="text-gray-400 text-xs">This month</p>
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-6">
-        <div className="space-y-3">
-          {filteredData.map((item, index) => (
-            <div key={index} className="bg-gray-700 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-semibold text-white">{item.month}</h4>
-                  <p className="text-sm text-gray-400">{item.protocol}</p>
-                </div>
-                <Badge className={getStatusColor(item.status)}>
-                  {item.status}
-                </Badge>
-              </div>
-
-              <Separator className="my-2 bg-gray-600" />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-400">Invested</p>
-                  <p className="font-semibold text-white">
-                    ${item.invested.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Earned</p>
-                  <p className="font-semibold text-emerald-400">
-                    ${item.earned.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-2">
-                <p className="text-xs text-gray-400">APY: {item.apy}%</p>
-                <div className="w-full bg-gray-600 rounded-full h-1.5 mt-1">
-                  <div
-                    className="bg-emerald-500 h-1.5 rounded-full"
-                    style={{
-                      width: `${Math.min(
-                        (item.earned / item.invested) * 100,
-                        100
-                      )}%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Investment History - Compact Cards */}
+      <div className="flex-1 overflow-hidden">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-white font-medium text-sm">Investment History</h3>
+          <span className="text-gray-400 text-xs">
+            {filteredData.length} entries
+          </span>
         </div>
-        <div ref={messagesEndRef} />
-      </ScrollArea>
 
-      <div className="p-6 border-t border-gray-600">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-400">Current Month</p>
-            <p className="font-semibold text-white">
-              $
-              {investmentData[
-                investmentData.length - 1
-              ]?.invested.toLocaleString() || 0}
-            </p>
+        <ScrollArea className="h-full">
+          <div className="space-y-2 pr-2">
+            {filteredData.map((item, index) => (
+              <div
+                key={index}
+                className="bg-gray-800/30 rounded-xl p-3 hover:bg-gray-800/50 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <h4 className="font-medium text-white text-sm">
+                      {item.month.split(" ")[0]}
+                    </h4>
+                    <Badge
+                      className={`${getStatusColor(
+                        item.status
+                      )} text-xs px-2 py-0.5`}
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
+                  <p className="text-gray-400 text-xs">{item.apy}% APY</p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <p className="text-gray-400 mb-1">Invested</p>
+                    <p className="text-white font-semibold">
+                      ${(item.invested / 1000).toFixed(1)}k
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 mb-1">Earned</p>
+                    <p className="text-emerald-400 font-semibold">
+                      ${item.earned.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 mb-1">Return</p>
+                    <p className="text-blue-400 font-semibold">
+                      {((item.earned / item.invested) * 100).toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-2">
+                  <div className="w-full bg-gray-700 rounded-full h-1">
+                    <div
+                      className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-1 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(
+                          (item.earned / item.invested) * 100,
+                          100
+                        )}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-400">Projected Earnings</p>
-            <p className="font-semibold text-emerald-400">
-              $
-              {(
-                ((investmentData[investmentData.length - 1]?.invested || 0) *
-                  0.082) /
-                12
-              ).toFixed(2)}
-            </p>
-          </div>
-        </div>
+          <div ref={messagesEndRef} />
+        </ScrollArea>
       </div>
-    </Card>
+    </div>
   );
 };
 

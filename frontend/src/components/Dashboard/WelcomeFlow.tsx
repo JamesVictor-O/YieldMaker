@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAccount } from "wagmi";
 import { saveOnboardingAnswers } from "../../utils/api";
 import { User } from "../../types";
 import { ChevronLeft, ChevronRight, CheckCircle, Circle } from "lucide-react";
@@ -11,6 +12,7 @@ interface WelcomeFlowProps {
 const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const { address } = useAccount();
 
   const questions = [
     {
@@ -18,7 +20,11 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
       question: "How familiar are you with DeFi?",
       subtitle: "This helps us recommend the best strategies for you",
       options: [
-        { value: "beginner", label: "Complete beginner", desc: "I'm new to crypto" },
+        {
+          value: "beginner",
+          label: "Complete beginner",
+          desc: "I'm new to crypto",
+        },
         {
           value: "intermediate",
           label: "Some experience",
@@ -36,7 +42,11 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
       question: "How much risk are you comfortable with?",
       subtitle: "We'll match you with appropriate investment strategies",
       options: [
-        { value: "low", label: "Low risk", desc: "I prefer stable, predictable returns" },
+        {
+          value: "low",
+          label: "Low risk",
+          desc: "I prefer stable, predictable returns",
+        },
         {
           value: "medium",
           label: "Medium risk",
@@ -55,8 +65,16 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
       subtitle: "This helps us suggest the most cost-effective strategies",
       options: [
         { value: "small", label: "Under $1,000", desc: "Starting small" },
-        { value: "medium", label: "$1,000 - $10,000", desc: "Moderate investment" },
-        { value: "large", label: "Over $10,000", desc: "Significant investment" },
+        {
+          value: "medium",
+          label: "$1,000 - $10,000",
+          desc: "Moderate investment",
+        },
+        {
+          value: "large",
+          label: "Over $10,000",
+          desc: "Significant investment",
+        },
       ],
     },
   ];
@@ -71,10 +89,10 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
     } else {
       // Save answers to backend
       try {
-        await saveOnboardingAnswers(answers);
+        await saveOnboardingAnswers(answers, address);
       } catch (e) {
         // Optionally handle error (show toast, etc)
-        console.error(e);
+        console.error("Failed to save onboarding data:", e);
       }
       // Calculate risk profile based on answers
       const riskProfile = calculateRiskProfile(answers);
@@ -120,7 +138,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 {Math.round(progressPercentage)}% Complete
               </span>
             </div>
-            
+
             {/* Progress Bar */}
             <div className="w-full bg-gray-700 rounded-full h-1 overflow-hidden">
               <div
@@ -168,7 +186,9 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 return (
                   <button
                     key={option.value}
-                    onClick={() => handleAnswer(currentQuestion.id, option.value)}
+                    onClick={() =>
+                      handleAnswer(currentQuestion.id, option.value)
+                    }
                     className={`w-full p-4 sm:p-6 text-left border-2 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
                       isSelected
                         ? "border-emerald-500 bg-emerald-500/10"
@@ -224,7 +244,9 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 }`}
               >
                 <span>
-                  {currentStep === questions.length - 1 ? "Complete Setup" : "Continue"}
+                  {currentStep === questions.length - 1
+                    ? "Complete Setup"
+                    : "Continue"}
                 </span>
                 <ChevronRight className="w-4 h-4" />
               </button>
