@@ -6,10 +6,20 @@ import MainDashboard from "@/components/Dashboard/MainDashboard";
 import { User } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useUserOnboarding } from "@/hooks/useUserOnboarding";
 
 export default function DashboardPage() {
   const { ready, authenticated, user: privyUser, login } = usePrivy();
   const [user, setUser] = useState<User | null>(null);
+
+  // Use the onboarding hook to manage user state properly
+  const {
+    isNewUser,
+    riskProfile,
+    isLoading: isOnboardingLoading,
+    markOnboardingComplete,
+   
+  } = useUserOnboarding();
 
   type MinimalWallet = { address?: string };
   type MinimalLinkedAccount = { type?: string; address?: string };
@@ -27,15 +37,15 @@ export default function DashboardPage() {
   const address = getWalletAddress();
 
   useEffect(() => {
-    if (isConnected && address) {
+    if (isConnected && address && !isOnboardingLoading) {
       setUser({
         address,
         balance: 0, // This would be fetched from the blockchain
-        isNewUser: true,
-        riskProfile: undefined,
+        isNewUser,
+        riskProfile,
       });
     }
-  }, [isConnected, address]);
+  }, [isConnected, address, isNewUser, riskProfile, isOnboardingLoading]);
 
   if (!isConnected) {
     return (
@@ -60,18 +70,22 @@ export default function DashboardPage() {
     );
   }
 
-  if (!user) {
+  if (!user || isOnboardingLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-gray-900 border-gray-800">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl font-semibold text-gray-900">
+            <CardTitle className="text-xl font-semibold text-white">
               Loading Dashboard
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-            <p className="text-gray-600">Loading your profile...</p>
+            <div className="w-16 h-16 bg-gray-700 rounded-full mx-auto animate-pulse"></div>
+            <p className="text-gray-400">
+              {isOnboardingLoading
+                ? "Checking your profile..."
+                : "Loading your profile..."}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -79,9 +93,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className=" bg-gray-950 p-4">
-      <div className="max-w-7xl mx-auto mc">
-        <MainDashboard user={user} />
+    <div className=" bg-gray-950 md:p-4">
+    
+
+      <div className="max-w-7xl mx-auto m">
+        <MainDashboard
+          user={user}
+          onOnboardingComplete={markOnboardingComplete}
+        />
       </div>
     </div>
   );
