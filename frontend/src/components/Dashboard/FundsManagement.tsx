@@ -1,37 +1,164 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import DepositModal from "./modals/DepositModal";
 import WithdrawModal from "./modals/WithdrawModal";
 import SendModal from "./modals/SendModal";
-import DepositModal from "./modals/DepositModal";
 
 interface FundsManagementProps {
   userBalance: number;
+  userInitialDeposit: number;
+  realEarnings: number;
   onBalanceUpdate: (newBalance: number) => void;
+}
+
+interface Transaction {
+  id: string;
+  type: "deposit" | "withdraw" | "send";
+  amount: number;
+  timestamp: Date;
+  status: "completed" | "pending" | "failed";
+  hash?: string;
 }
 
 const FundsManagement: React.FC<FundsManagementProps> = ({
   userBalance,
+  userInitialDeposit,
+  realEarnings,
   onBalanceUpdate,
 }) => {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isSendOpen, setIsSendOpen] = useState(false);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(
+    []
+  );
+
+  // Load transaction history from localStorage (in a real app, this would come from blockchain events)
+  useEffect(() => {
+    const savedTransactions = localStorage.getItem("userTransactions");
+    if (savedTransactions) {
+      try {
+        console.log("Loading saved transactions:", savedTransactions);
+        const rawTransactions = JSON.parse(savedTransactions);
+        console.log("Parsed transactions:", rawTransactions);
+
+        const transactions = rawTransactions.map((tx: Partial<Transaction>) => {
+          console.log(
+            "Processing transaction:",
+            tx,
+            "amount:",
+            tx.amount,
+            "type:",
+            typeof tx.amount
+          );
+          return {
+            ...tx,
+            amount: Number(tx.amount) || 0, // Ensure amount is a valid number
+            timestamp: new Date(tx.timestamp || Date.now()),
+          };
+        });
+        console.log("Final transactions:", transactions);
+        setRecentTransactions(transactions.slice(-5)); // Show last 5 transactions
+      } catch (error) {
+        console.error(
+          "Error loading transactions, clearing localStorage:",
+          error
+        );
+        localStorage.removeItem("userTransactions");
+      }
+    }
+  }, []);
+
+  const addTransaction = (
+    type: "deposit" | "withdraw" | "send",
+    amount: number
+  ) => {
+    console.log("Adding transaction:", {
+      type,
+      amount,
+      amountType: typeof amount,
+    });
+
+    const newTransaction: Transaction = {
+      id: Date.now().toString(),
+      type,
+      amount: Number(amount), // Convert to number
+      timestamp: new Date(),
+      status: "completed",
+    };
+
+    console.log("Created transaction:", newTransaction);
+
+    const updatedTransactions = [newTransaction, ...recentTransactions].slice(
+      0,
+      5
+    );
+    setRecentTransactions(updatedTransactions);
+
+    // Save to localStorage
+    const allTransactions = JSON.parse(
+      localStorage.getItem("userTransactions") || "[]"
+    );
+    allTransactions.push(newTransaction);
+    localStorage.setItem("userTransactions", JSON.stringify(allTransactions));
+  };
 
   const handleDepositSuccess = (amount: number) => {
     onBalanceUpdate(userBalance + amount);
+    addTransaction("deposit", amount);
     setIsDepositOpen(false);
   };
 
   const handleWithdrawSuccess = (amount: number) => {
     onBalanceUpdate(userBalance - amount);
+    addTransaction("withdraw", amount);
     setIsWithdrawOpen(false);
   };
 
   const handleSendSuccess = (amount: number) => {
     onBalanceUpdate(userBalance - amount);
+    addTransaction("send", amount);
     setIsSendOpen(false);
   };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case "deposit":
+        return "💰";
+      case "withdraw":
+        return "📤";
+      case "send":
+        return "📨";
+      default:
+        return "💫";
+    }
+  };
+
+  const getTransactionColor = (type: string) => {
+    switch (type) {
+      case "deposit":
+        return "text-emerald-400";
+      case "withdraw":
+        return "text-blue-400";
+      case "send":
+        return "text-purple-400";
+      default:
+        return "text-gray-400";
+    }
+  };
+
+  // Calculate 24h change (simplified - in reality this would be more complex)
+  const dailyChangePercent = realEarnings > 0 ? 2.4 : 0;
 
   return (
     <div className="w-full space-y-4">
@@ -39,9 +166,6 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
       <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-800">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-              <div className="w-5 h-5 bg-emerald-500 rounded-full"></div>
-            </div>
             <div>
               <h3 className="text-white font-semibold text-base sm:text-lg">
                 Portfolio
@@ -61,7 +185,14 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
             ${userBalance.toLocaleString()}
           </p>
           <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <span className="text-emerald-400">+2.4%</span>
+            <span
+              className={`${
+                dailyChangePercent >= 0 ? "text-emerald-400" : "text-red-400"
+              }`}
+            >
+              {dailyChangePercent >= 0 ? "+" : ""}
+              {dailyChangePercent}%
+            </span>
             <span className="text-gray-400">•</span>
             <span className="text-gray-400">Last 24h</span>
           </div>
@@ -72,28 +203,24 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
       <div className="grid grid-cols-3 gap-3">
         <Button
           onClick={() => setIsDepositOpen(true)}
-          className="h-14 sm:h-16 flex flex-col items-center justify-center gap-1 bg-emerald-600 hover:bg-emerald-700 rounded-xl border-0 shadow-lg active:scale-95 transition-all"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-xl font-medium text-sm"
         >
-          <div className="text-base sm:text-lg">↗️</div>
-          <div className="text-xs sm:text-sm font-medium">Deposit</div>
+          <span className="mr-2">💰</span>
+          Deposit
         </Button>
-
         <Button
           onClick={() => setIsWithdrawOpen(true)}
-          variant="outline"
-          className="h-14 sm:h-16 flex flex-col items-center justify-center gap-1 bg-gray-800/50 hover:bg-gray-700/70 text-white border-gray-700 hover:border-gray-600 rounded-xl active:scale-95 transition-all"
+          className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium text-sm"
         >
-          <div className="text-base sm:text-lg">↙️</div>
-          <div className="text-xs sm:text-sm font-medium">Withdraw</div>
+          <span className="mr-2">📤</span>
+          Withdraw
         </Button>
-
         <Button
           onClick={() => setIsSendOpen(true)}
-          variant="outline"
-          className="h-14 sm:h-16 flex flex-col items-center justify-center gap-1 bg-gray-800/50 hover:bg-gray-700/70 text-white border-gray-700 hover:border-gray-600 rounded-xl active:scale-95 transition-all"
+          className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-xl font-medium text-sm"
         >
-          <div className="text-base sm:text-lg">→</div>
-          <div className="text-xs sm:text-sm font-medium">Send</div>
+          <span className="mr-2">📨</span>
+          Send
         </Button>
       </div>
 
@@ -102,16 +229,24 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
         <div className="bg-gray-800/30 rounded-xl p-3 sm:p-4">
           <p className="text-gray-400 text-xs mb-1">Total Deposits</p>
           <p className="text-white font-semibold text-sm sm:text-base">
-            $12,450
+            ${userInitialDeposit.toLocaleString()}
           </p>
-          <p className="text-emerald-400 text-xs">+5.2%</p>
+          <p className="text-emerald-400 text-xs">
+            {userInitialDeposit > 0 ? "Principal" : "No deposits"}
+          </p>
         </div>
         <div className="bg-gray-800/30 rounded-xl p-3 sm:p-4">
           <p className="text-gray-400 text-xs mb-1">Total Earned</p>
           <p className="text-white font-semibold text-sm sm:text-base">
-            $1,250
+            ${realEarnings.toLocaleString()}
           </p>
-          <p className="text-blue-400 text-xs">8.2% APY</p>
+          <p className="text-blue-400 text-xs">
+            {userInitialDeposit > 0
+              ? `${((realEarnings / userInitialDeposit) * 100).toFixed(
+                  2
+                )}% return`
+              : "0% APY"}
+          </p>
         </div>
       </div>
 
@@ -121,42 +256,77 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
           <h4 className="text-white font-medium text-sm sm:text-base">
             Recent Activity
           </h4>
-          <button className="text-gray-400 text-xs hover:text-white transition-colors">
-            View All
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                localStorage.removeItem("userTransactions");
+                setRecentTransactions([]);
+                console.log("Cleared transaction history");
+              }}
+              className="text-red-400 text-xs hover:text-red-300 transition-colors"
+            >
+              Clear
+            </button>
+            <button className="text-gray-400 text-xs hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
         </div>
 
         <div className="space-y-2">
-          {/* Compact Transaction Items */}
-          <div className="flex items-center justify-between bg-gray-800/20 rounded-xl p-3 hover:bg-gray-800/40 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                <span className="text-emerald-400 text-sm">↗️</span>
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((transaction) => (
+              <div
+                key={transaction.id}
+                className="bg-gray-800/20 rounded-lg p-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">
+                    {getTransactionIcon(transaction.type)}
+                  </span>
+                  <div>
+                    <p className="text-white text-xs font-medium capitalize">
+                      {transaction.type}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      {formatDate(transaction.timestamp)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p
+                    className={`text-xs font-medium ${getTransactionColor(
+                      transaction.type
+                    )}`}
+                  >
+                    {transaction.type === "deposit" ? "+" : "-"}$
+                    {(transaction.amount || 0).toLocaleString()}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        transaction.status === "completed"
+                          ? "bg-emerald-500"
+                          : transaction.status === "pending"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                      }`}
+                    ></div>
+                    <span className="text-gray-400 text-xs capitalize">
+                      {transaction.status}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-white font-medium text-sm">Deposit</p>
-                <p className="text-gray-400 text-xs">2h ago</p>
-              </div>
+            ))
+          ) : (
+            <div className="bg-gray-800/20 rounded-lg p-4 text-center">
+              <p className="text-gray-400 text-sm">No recent activity</p>
+              <p className="text-gray-500 text-xs">
+                Make your first deposit to get started
+              </p>
             </div>
-            <div className="text-right">
-              <p className="text-emerald-400 font-semibold text-sm">+$500</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between bg-gray-800/20 rounded-xl p-3 hover:bg-gray-800/40 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <span className="text-blue-400 text-sm">→</span>
-              </div>
-              <div>
-                <p className="text-white font-medium text-sm">Send</p>
-                <p className="text-gray-400 text-xs">1d ago</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-red-400 font-semibold text-sm">-$200</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -167,14 +337,12 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
         onSuccess={handleDepositSuccess}
         currentBalance={userBalance}
       />
-
       <WithdrawModal
         isOpen={isWithdrawOpen}
         onClose={() => setIsWithdrawOpen(false)}
         onSuccess={handleWithdrawSuccess}
         currentBalance={userBalance}
       />
-
       <SendModal
         isOpen={isSendOpen}
         onClose={() => setIsSendOpen(false)}

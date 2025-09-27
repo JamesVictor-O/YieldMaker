@@ -32,15 +32,15 @@ const DepositModal: React.FC<DepositModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  currentBalance,
 }) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [step, setStep] = useState<"input" | "approve" | "deposit" | "waiting">(
-    "input"
-  );
   const [needsApproval, setNeedsApproval] = useState(false);
+  const [pendingDeposit, setPendingDeposit] = useState<{
+    amount: string;
+    address: string;
+  } | null>(null);
 
   const { address } = useAccount();
 
@@ -62,29 +62,22 @@ const DepositModal: React.FC<DepositModalProps> = ({
   } = useTokenApproval(CONTRACT_ADDRESSES.CUSD);
 
   // Get user's cUSD balance
-  const {
-   
-    formatted: formattedBalance,
-    refetch: refetchBalance,
-  } = useUserTokenBalance(CONTRACT_ADDRESSES.CUSD, address);
+  const { formatted: formattedBalance, refetch: refetchBalance } =
+    useUserTokenBalance(CONTRACT_ADDRESSES.CUSD, address);
 
   // Check current allowance
-  const {
-    allowance,
-   
-    refetch: refetchAllowance,
-  } = useTokenAllowance(
+  const { allowance, refetch: refetchAllowance } = useTokenAllowance(
     CONTRACT_ADDRESSES.CUSD,
     address || "0x0",
     CONTRACT_ADDRESSES.YIELDMAKER_VAULT
   );
 
+  // Overall loading state
   const isLoading =
     isApprovePending ||
     isApproveConfirming ||
     isDepositPending ||
-    isDepositConfirming ||
-    step === "waiting";
+    isDepositConfirming;
 
   const validateAmount = (value: string): boolean => {
     const numValue = parseFloat(value);
@@ -113,123 +106,99 @@ const DepositModal: React.FC<DepositModalProps> = ({
     setAmount(value);
     if (value) {
       validateAmount(value);
+      // Check if approval will be needed for this amount
+      checkApprovalNeeded(value);
     } else {
       setError("");
+      setNeedsApproval(false);
     }
   };
 
   const handleQuickAmount = (quickAmount: number) => {
-    setAmount(quickAmount.toString());
+    const amountStr = quickAmount.toString();
+    setAmount(amountStr);
     setError("");
+    // Check if approval will be needed for this amount
+    checkApprovalNeeded(amountStr);
   };
 
-  const checkApprovalNeeded = async (
-    amountToDeposit: string
-  ): Promise<boolean> => {
-    try {
-      await refetchAllowance();
-      const amountWei = parseEther(amountToDeposit);
-      return allowance < amountWei;
-    } catch (err) {
-      console.error("Error checking approval:", err);
-      return true; // Assume approval needed if check fails
-    }
-  };
+  // Check if approval is needed
+  const checkApprovalNeeded = useCallback(
+    async (amountToDeposit: string) => {
+      try {
+        await refetchAllowance();
+        const amountWei = parseEther(amountToDeposit);
+        const needed = allowance < amountWei;
+        setNeedsApproval(needed);
+        console.log("Approval check:", {
+          amount: amountToDeposit,
+          allowance: allowance.toString(),
+          amountWei: amountWei.toString(),
+          needsApproval: needed,
+        });
+      } catch (err) {
+        console.error("Error checking approval:", err);
+        setNeedsApproval(true);
+      }
+    },
+    [allowance, refetchAllowance]
+  );
 
+  // Main deposit handler
   const handleDeposit = async () => {
     if (!validateAmount(amount) || !address) {
       return;
     }
-
+  
     setError("");
-
+  
     try {
+      // Validate amount before proceeding
+      if (!amount || parseFloat(amount) <= 0) {
+        setError("Please enter a valid amount");
+        return;
+      }
+  
       // Check if approval is needed
-      const approvalNeeded = await checkApprovalNeeded(amount);
-      setNeedsApproval(approvalNeeded);
-
-      if (approvalNeeded) {
-        // Step 1: Approve tokens
-        setStep("approve");
+      await checkApprovalNeeded(amount);
+  
+      if (needsApproval) {
+        // Trigger approval with vault address as spender
         await approve(CONTRACT_ADDRESSES.YIELDMAKER_VAULT, amount);
+        // Store pending deposit to trigger after approval
+        setPendingDeposit({ amount, address });
       } else {
-        // Step 2: Deposit directly if already approved
-        setStep("deposit");
+        // Proceed with deposit if approval is not needed
         await deposit(amount, address);
       }
     } catch (err) {
       console.error("Transaction error:", err);
       setError(
-        `Transaction failed: ${
-          err instanceof Error ? err.message : String(err)
-        }`
+        `Transaction failed: ${err instanceof Error ? err.message : String(err)}`
       );
-      setStep("input");
     }
   };
 
-  const handleActualDeposit = useCallback(async () => {
-    if (!address || !amount) {
-      console.error("Missing address or amount");
-      return;
-    }
-
-    try {
-      console.log(
-        "Starting deposit for amount:",
-        amount,
-        "to address:",
-        address
-      );
-      setStep("deposit");
-      await deposit(amount, address);
-    } catch (err) {
-      console.error("Deposit error:", err);
-      setError(
-        `Deposit failed: ${err instanceof Error ? err.message : String(err)}`
-      );
-      setStep("input");
-    }
-  }, [address, amount, deposit]);
-
-  // Handle approval confirmation
+  // Handle approval success - trigger deposit
   useEffect(() => {
-    console.log("Approval state:", { isApproveConfirmed, step, needsApproval });
+    if (isApproveConfirmed && pendingDeposit) {
+      console.log("Approval confirmed, proceeding with deposit");
 
-    if (isApproveConfirmed && step === "approve" && needsApproval) {
-      console.log("Approval confirmed, proceeding to deposit");
-      setStep("waiting");
-
-      // Wait for blockchain state to update, then proceed with deposit
-      const timer = setTimeout(async () => {
-        try {
-          await refetchAllowance();
-          await handleActualDeposit();
-        } catch (err) {
-          console.error("Error after approval:", err);
-          setError("Failed to proceed after approval");
-          setStep("input");
-        }
-      }, 2000); // Increased wait time
+      // Wait a moment for blockchain state to update, then deposit
+      const timer = setTimeout(() => {
+        deposit(pendingDeposit.amount, pendingDeposit.address);
+        setPendingDeposit(null); // Clear pending state
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [
-    isApproveConfirmed,
-    step,
-    needsApproval,
-    refetchAllowance,
-    handleActualDeposit,
-  ]);
+  }, [isApproveConfirmed, pendingDeposit, deposit]);
 
-  // Handle deposit confirmation
+  // Handle deposit success
   useEffect(() => {
-    console.log("Deposit state:", { isDepositConfirmed, step });
-
-    if (isDepositConfirmed && (step === "deposit" || step === "waiting")) {
+    if (isDepositConfirmed) {
       console.log("Deposit confirmed");
       setSuccess(true);
-      // Refresh balance data
       refetchBalance();
 
       const timer = setTimeout(() => {
@@ -239,19 +208,19 @@ const DepositModal: React.FC<DepositModalProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [isDepositConfirmed, step, amount, onSuccess, refetchBalance]);
+  }, [isDepositConfirmed, amount, onSuccess, refetchBalance]);
 
   // Handle errors
   useEffect(() => {
     if (approveError) {
       console.error("Approve error:", approveError);
       setError(`Approval failed: ${approveError.message}`);
-      setStep("input");
+      setPendingDeposit(null);
     }
     if (depositError) {
       console.error("Deposit error:", depositError);
       setError(`Deposit failed: ${depositError.message}`);
-      setStep("input");
+      setPendingDeposit(null);
     }
   }, [approveError, depositError]);
 
@@ -259,36 +228,39 @@ const DepositModal: React.FC<DepositModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       console.log("Modal opened, resetting state");
-      setStep("input");
       setError("");
       setSuccess(false);
       setNeedsApproval(false);
+      setPendingDeposit(null);
       setAmount("");
+
+      // Refresh allowance when modal opens
+      if (address) {
+        refetchAllowance();
+        refetchBalance();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, address, refetchAllowance, refetchBalance]);
 
   const handleClose = () => {
     if (!isLoading) {
       setAmount("");
       setError("");
       setSuccess(false);
-      setStep("input");
       setNeedsApproval(false);
+      setPendingDeposit(null);
       onClose();
     }
   };
 
   const getStepMessage = () => {
-    switch (step) {
-      case "approve":
-        return "Approving token...";
-      case "waiting":
-        return "Waiting for approval confirmation...";
-      case "deposit":
-        return "Depositing...";
-      default:
-        return "Processing...";
+    if (isApprovePending || isApproveConfirming) {
+      return "Step 1: Approving token access...";
     }
+    if (isDepositPending || isDepositConfirming) {
+      return "Step 2: Depositing funds...";
+    }
+    return "Processing...";
   };
 
   const getButtonText = () => {
@@ -301,7 +273,8 @@ const DepositModal: React.FC<DepositModalProps> = ({
       );
     }
 
-    if (step === "approve" || needsApproval) {
+    // Show different button text based on approval status
+    if (needsApproval) {
       return "Approve & Deposit";
     }
 
@@ -314,59 +287,33 @@ const DepositModal: React.FC<DepositModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">📥</span>
+              <span className="text-white text-xs">💰</span>
             </div>
             Deposit Funds
           </DialogTitle>
           <DialogDescription>
-            Add funds to your YieldMaker account to start earning yields.
+            Add funds to your YieldMaker vault to start earning yield.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Current Balance & Step Indicator */}
+          {/* Current Balance */}
           <div className="bg-gray-50 rounded-lg p-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm text-gray-500">Vault Balance</p>
-                <p className="text-lg font-semibold text-gray-900">
-                  ${currentBalance.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">cUSD Balance</p>
-                <p className="text-sm font-semibold text-gray-900">
-                  {formattedBalance} cUSD
-                </p>
-              </div>
-            </div>
-
-            {/* Step Indicator */}
-            {step !== "input" && (
-              <div className="mt-3 flex items-center gap-2 text-sm">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    step === "approve" || step === "waiting"
-                      ? "bg-yellow-500 animate-pulse"
-                      : step === "deposit"
-                      ? "bg-blue-500 animate-pulse"
-                      : "bg-green-500"
-                  }`}
-                ></div>
-                <span className="text-gray-600">{getStepMessage()}</span>
-              </div>
-            )}
+            <p className="text-sm text-gray-500">Your cUSD Balance</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${parseFloat(formattedBalance).toLocaleString()}
+            </p>
           </div>
 
           {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount (USD)</Label>
+            <Label htmlFor="deposit-amount">Amount (USD)</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                 $
               </span>
               <Input
-                id="amount"
+                id="deposit-amount"
                 type="number"
                 placeholder="0.00"
                 value={amount}
@@ -382,9 +329,9 @@ const DepositModal: React.FC<DepositModalProps> = ({
 
           {/* Quick Amount Buttons */}
           <div className="space-y-2">
-            <Label className="text-sm text-gray-500">Quick Amount</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {[100, 500, 1000, 2500, 5000, 10000].map((quickAmount) => (
+            <Label>Quick amounts</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {[10, 50, 100, 500].map((quickAmount) => (
                 <Button
                   key={quickAmount}
                   variant="outline"
@@ -393,7 +340,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
                   disabled={isLoading}
                   className="text-xs"
                 >
-                  ${quickAmount.toLocaleString()}
+                  ${quickAmount}
                 </Button>
               ))}
             </div>
