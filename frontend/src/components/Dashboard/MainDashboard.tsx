@@ -114,10 +114,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     <div className="min-h-screen text-white">
       {/* Mobile-First Container */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-        {/* Top Stats Cards - Mobile Optimized */}
+        {/* Top Stats Cards - Clean Design */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {/* Total Portfolio */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
@@ -131,7 +131,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           </div>
 
           {/* Current Earnings */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
@@ -154,7 +154,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           </div>
 
           {/* Risk Level */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -174,9 +174,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           </div>
 
           {/* Active Strategy */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
                 Strategy
               </span>
@@ -204,7 +204,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           {/* Right Column - Strategy & Performance */}
           <div className="space-y-6">
             {/* Strategy Overview */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-2xl p-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">
               <h3 className="text-white font-semibold text-lg mb-4">
                 Strategy Overview
               </h3>
@@ -251,11 +251,11 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             </div>
 
             {/* Performance Chart Placeholder */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-2xl p-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">
               <h3 className="text-white font-semibold text-lg mb-4">
                 Performance
               </h3>
-              <div className="h-48 bg-gray-800/30 rounded-xl flex items-center justify-center">
+              <div className="h-48 bg-gray-800 rounded-xl flex items-center justify-center">
                 <p className="text-gray-400 text-sm">Chart coming soon</p>
               </div>
             </div>

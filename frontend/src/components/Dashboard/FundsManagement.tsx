@@ -38,13 +38,35 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
   useEffect(() => {
     const savedTransactions = localStorage.getItem("userTransactions");
     if (savedTransactions) {
-      const transactions = JSON.parse(savedTransactions).map(
-        (tx: Partial<Transaction>) => ({
-          ...tx,
-          timestamp: new Date(tx.timestamp || Date.now()),
-        })
-      );
-      setRecentTransactions(transactions.slice(-5)); // Show last 5 transactions
+      try {
+        console.log("Loading saved transactions:", savedTransactions);
+        const rawTransactions = JSON.parse(savedTransactions);
+        console.log("Parsed transactions:", rawTransactions);
+
+        const transactions = rawTransactions.map((tx: Partial<Transaction>) => {
+          console.log(
+            "Processing transaction:",
+            tx,
+            "amount:",
+            tx.amount,
+            "type:",
+            typeof tx.amount
+          );
+          return {
+            ...tx,
+            amount: Number(tx.amount) || 0, // Ensure amount is a valid number
+            timestamp: new Date(tx.timestamp || Date.now()),
+          };
+        });
+        console.log("Final transactions:", transactions);
+        setRecentTransactions(transactions.slice(-5)); // Show last 5 transactions
+      } catch (error) {
+        console.error(
+          "Error loading transactions, clearing localStorage:",
+          error
+        );
+        localStorage.removeItem("userTransactions");
+      }
     }
   }, []);
 
@@ -52,13 +74,21 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
     type: "deposit" | "withdraw" | "send",
     amount: number
   ) => {
+    console.log("Adding transaction:", {
+      type,
+      amount,
+      amountType: typeof amount,
+    });
+
     const newTransaction: Transaction = {
       id: Date.now().toString(),
       type,
-      amount,
+      amount: Number(amount), // Convert to number
       timestamp: new Date(),
       status: "completed",
     };
+
+    console.log("Created transaction:", newTransaction);
 
     const updatedTransactions = [newTransaction, ...recentTransactions].slice(
       0,
@@ -226,9 +256,21 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
           <h4 className="text-white font-medium text-sm sm:text-base">
             Recent Activity
           </h4>
-          <button className="text-gray-400 text-xs hover:text-white transition-colors">
-            View All
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                localStorage.removeItem("userTransactions");
+                setRecentTransactions([]);
+                console.log("Cleared transaction history");
+              }}
+              className="text-red-400 text-xs hover:text-red-300 transition-colors"
+            >
+              Clear
+            </button>
+            <button className="text-gray-400 text-xs hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -258,7 +300,7 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
                     )}`}
                   >
                     {transaction.type === "deposit" ? "+" : "-"}$
-                    {transaction.amount.toLocaleString()}
+                    {(transaction.amount || 0).toLocaleString()}
                   </p>
                   <div className="flex items-center gap-1">
                     <div

@@ -11,8 +11,11 @@ export const CONTRACT_ADDRESSES = {
   // Asset addresses
   CUSD: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1", // cUSD on Alfajores
 
-  // Protocol addresses (to be set when deploying strategies)
-  AAVE_POOL: "0x0000000000000000000000000000000000000000", // Set when deploying
+  // Protocol addresses
+  // NOTE: Aave V3 is already live on Celo L2! Need to find actual contract addresses
+  AAVE_POOL: "0x0000000000000000000000000000000000000000", // TODO: Get Aave V3 Pool address on Celo L2
+  AAVE_POOL_ADDRESS_PROVIDER: "0x0000000000000000000000000000000000000000", // TODO: Get Aave V3 PoolAddressProvider on Celo L2
+  AAVE_STRATEGY: "0x0000000000000000000000000000000000000000", // TODO: Deploy AaveStrategy contract
   COMPOUND_COMPTROLLER: "0x0000000000000000000000000000000000000000", // Set when deploying
   YEARN_VAULT: "0x0000000000000000000000000000000000000000", // Set when deploying
   UNISWAP_V3_POOL: "0x0000000000000000000000000000000000000000", // Set when deploying

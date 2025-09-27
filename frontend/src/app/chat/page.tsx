@@ -7,7 +7,7 @@ import { User } from "@/types";
 import ConnectWallet from "@/components/Web3/ConnectWallet";
 
 export default function ChatPage() {
-   const { ready, authenticated, user: privyUser, login } = usePrivy();
+   const { ready, authenticated, user: privyUser } = usePrivy();
   const [user, setUser] = useState<User | null>(null);
 
     type MinimalWallet = { address?: string };
