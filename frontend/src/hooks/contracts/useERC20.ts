@@ -3,53 +3,11 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { parseEther, formatEther } from "viem";
+import { parseEther, formatEther, erc20Abi } from "viem";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 
-// Standard ERC20 ABI (minimal functions we need)
-const ERC20_ABI = [
-  {
-    inputs: [{ name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { name: "spender", type: "address" },
-      { name: "amount", type: "uint256" },
-    ],
-    name: "approve",
-    outputs: [{ name: "", type: "bool" }],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { name: "owner", type: "address" },
-      { name: "spender", type: "address" },
-    ],
-    name: "allowance",
-    outputs: [{ name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "decimals",
-    outputs: [{ name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "symbol",
-    outputs: [{ name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+// Use the standard ERC20 ABI from viem
+const ERC20_ABI = erc20Abi;
 
 // Hook for reading ERC20 token information
 export function useERC20Info(tokenAddress: string) {
@@ -107,14 +65,47 @@ export function useTokenApproval(tokenAddress: string) {
       hash,
     });
 
+  console.log("useTokenApproval hook state:", {
+    tokenAddress,
+    hash: hash?.toString(),
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error: error?.message,
+  });
+
   const approve = (spender: string, amount: string) => {
+    if (!amount || amount === "0") {
+      console.error("Invalid amount for approval:", amount);
+      return;
+    }
+
     const amountWei = parseEther(amount);
-    writeContract({
-      address: tokenAddress as `0x${string}`,
-      abi: ERC20_ABI,
-      functionName: "approve",
-      args: [spender as `0x${string}`, amountWei],
+    console.log("useTokenApproval - approve called:", {
+      tokenAddress,
+      spender,
+      amount,
+      amountWei: amountWei.toString(),
     });
+
+    try {
+      console.log("About to call writeContract with:", {
+        address: tokenAddress,
+        functionName: "approve",
+        args: [spender, amountWei.toString()],
+        abi: "erc20Abi",
+      });
+
+      writeContract({
+        address: tokenAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: [spender as `0x${string}`, amountWei],
+      });
+      console.log("writeContract called successfully");
+    } catch (error) {
+      console.error("Error calling writeContract:", error);
+    }
   };
 
   return {

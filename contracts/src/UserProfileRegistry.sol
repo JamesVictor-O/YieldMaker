@@ -33,6 +33,8 @@ contract UserProfileRegistry is Ownable {
 
     event ProfileDeactivated(address indexed user, uint32 timestamp);
 
+    constructor() Ownable(msg.sender) {}
+
     /**
      * @dev Updates user's risk profile - called by backend after onboarding
      * @param user The user's wallet address
