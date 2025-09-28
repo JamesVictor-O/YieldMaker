@@ -3,8 +3,11 @@ import { formatEther } from "viem";
 import { User } from "@/types";
 import WelcomeFlow from "./WelcomeFlow";
 import FundsManagement from "./FundsManagement";
+import StrategyManager from "./StrategyManager";
 import { useVaultBalance, useVaultInfo } from "@/hooks/contracts/useVault";
 import { useAvailableStrategies } from "@/hooks/contracts/useStrategies";
+import { useMockAavePoolAPY } from "@/hooks/contracts/useMockAavePool";
+import { useAaveStrategyBalance } from "@/hooks/contracts/useAaveStrategy";
 import { useAccount } from "wagmi";
 
 interface MainDashboardProps {
@@ -28,6 +31,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   const { address } = useAccount();
 
   const availableStrategies = useAvailableStrategies();
+
+  // Get real-time APY from our deployed MockAavePool
+  const { apyDisplay, isLoading: apyLoading } = useMockAavePoolAPY();
+
+  // Get Aave strategy balance
+  const { balanceFormatted: aaveStrategyBalance } = useAaveStrategyBalance();
 
   // Convert vault balance to readable format - handle BigInt properly
   const vaultBalanceFormatted =
@@ -224,9 +233,11 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400 text-sm">Expected APY</span>
                   <span className="text-emerald-400 font-medium">
-                    {availableStrategies.find(
-                      (s) => s.address === currentStrategy
-                    )?.apy || "8.2%"}
+                    {apyLoading ? (
+                      <span className="animate-pulse">Loading...</span>
+                    ) : (
+                      apyDisplay || "8.2%"
+                    )}
                   </span>
                 </div>
 
@@ -247,18 +258,18 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                       : "0%"}
                   </span>
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Aave Strategy</span>
+                  <span className="text-white font-medium">
+                    ${formatNumber(aaveStrategyBalance)}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Performance Chart Placeholder */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">
-              <h3 className="text-white font-semibold text-lg mb-4">
-                Performance
-              </h3>
-              <div className="h-48 bg-gray-800 rounded-xl flex items-center justify-center">
-                <p className="text-gray-400 text-sm">Chart coming soon</p>
-              </div>
-            </div>
+            {/* Strategy Manager */}
+            <StrategyManager />
           </div>
         </div>
       </div>

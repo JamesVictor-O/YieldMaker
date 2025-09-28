@@ -18,21 +18,20 @@ const HeroSection = () => {
 
         <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 z-10">
           <div className="text-center">
-            {/* Main Heading - Mobile Optimized */}
+          
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight">
-              Turn <span className="text-emerald-400">Savings</span> into{" "}
-              <span className="text-emerald-400">Earnings</span>
+            Deposit <span className="text-emerald-400">once, </span> {" "}
+              <span className="text-emerald-400">earn everywhere</span>
             </h1>
 
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4 sm:px-0">
-              YieldMaker&apos;s AI guides you to{" "}
+             Earn from DeFi without the complexity{" "}
               <span className="text-emerald-400 font-semibold">
-                safe, high-yield
+              YieldMakers’s AI
               </span>{" "}
-              DeFi opportunities with simple conversations no crypto expertise
-              needed.
+              handles the research, audits, and strategies. You just deposit and relax.
             </p>
-
+            
             {/* Stats Row - Mobile Friendly */}
             <div className="flex flex-wrap justify-center gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12 px-4">
               <div className="text-center">
