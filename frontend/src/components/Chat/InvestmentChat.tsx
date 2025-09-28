@@ -65,7 +65,6 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({}) => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                     <h4 className="font-medium text-white text-sm">
                       {item.month.split(" ")[0]}
                     </h4>

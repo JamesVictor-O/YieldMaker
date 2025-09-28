@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { useAccount } from "wagmi";
+import React, { useState, useEffect } from "react";
 import { formatEther } from "viem";
-import { User } from "../../types";
-import InvestmentChat from "../Chat/InvestmentChat";
+import { User } from "@/types";
 import WelcomeFlow from "./WelcomeFlow";
 import FundsManagement from "./FundsManagement";
+import StrategyManager from "./StrategyManager";
 import { useVaultBalance, useVaultInfo } from "@/hooks/contracts/useVault";
 import { useAvailableStrategies } from "@/hooks/contracts/useStrategies";
-import { useInvestmentData } from "../../hooks/useInvestmentData";
+import { useMockAavePoolAPY } from "@/hooks/contracts/useMockAavePool";
+import { useAaveStrategyBalance } from "@/hooks/contracts/useAaveStrategy";
+import { useAccount } from "wagmi";
 
 interface MainDashboardProps {
   user: User;
@@ -21,23 +22,21 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   onOnboardingComplete,
 }) => {
   const [showWelcome, setShowWelcome] = useState(user.isNewUser);
+  const [userInitialDeposit, setUserInitialDeposit] = useState(0);
 
-  const { address } = useAccount();
   // Smart contract hooks for real-time data
   const { balance: vaultBalance, isLoading: balanceLoading } =
     useVaultBalance();
   const { totalAssets, strategy: currentStrategy } = useVaultInfo();
-
-  // Investment data management
-  const {
-    investmentData,
-    statistics,
-    selectedMonth,
-    setSelectedMonth,
-    availableMonths,
-  } = useInvestmentData();
+  const { address } = useAccount();
 
   const availableStrategies = useAvailableStrategies();
+
+  // Get real-time APY from our deployed MockAavePool
+  const { apyDisplay, isLoading: apyLoading } = useMockAavePoolAPY();
+
+  // Get Aave strategy balance
+  const { balanceFormatted: aaveStrategyBalance } = useAaveStrategyBalance();
 
   // Convert vault balance to readable format - handle BigInt properly
   const vaultBalanceFormatted =
@@ -52,6 +51,45 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   // Use real vault balance instead of mock balance
   const userBalance = vaultBalanceFormatted;
 
+  // Load user's initial deposit from localStorage (or could be from blockchain events)
+  useEffect(() => {
+    if (address) {
+      const savedInitialDeposit = localStorage.getItem(
+        `initialDeposit_${address}`
+      );
+      if (savedInitialDeposit) {
+        setUserInitialDeposit(parseFloat(savedInitialDeposit));
+      } else {
+        // If no initial deposit saved, assume current balance is the initial deposit
+        // This handles existing users who already have deposits
+        if (vaultBalanceFormatted > 0) {
+          setUserInitialDeposit(vaultBalanceFormatted);
+          localStorage.setItem(
+            `initialDeposit_${address}`,
+            vaultBalanceFormatted.toString()
+          );
+        }
+      }
+    }
+  }, [address, vaultBalanceFormatted]);
+
+  // Calculate real earnings
+  const realEarnings = Math.max(0, userBalance - userInitialDeposit);
+
+  // Update initial deposit when user makes new deposits
+  const handleBalanceUpdate = (newBalance: number) => {
+    if (address && newBalance > userBalance) {
+      // User made a deposit, update initial deposit tracker
+      const additionalDeposit = newBalance - userBalance;
+      const newInitialDeposit = userInitialDeposit + additionalDeposit;
+      setUserInitialDeposit(newInitialDeposit);
+      localStorage.setItem(
+        `initialDeposit_${address}`,
+        newInitialDeposit.toString()
+      );
+    }
+  };
+
   const handleWelcomeComplete = (
     riskProfile: "conservative" | "moderate" | "aggressive"
   ) => {
@@ -62,11 +100,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     if (onOnboardingComplete) {
       onOnboardingComplete(riskProfile);
     }
-  };
-
-  const handleBalanceUpdate = (newBalance: number) => {
-    // This will be automatically updated by the smart contract hooks
-    // No need to manually update state
   };
 
   if (showWelcome) {
@@ -90,10 +123,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     <div className="min-h-screen text-white">
       {/* Mobile-First Container */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-        {/* Top Stats Cards - Mobile Optimized */}
+        {/* Top Stats Cards - Clean Design */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {/* Total Portfolio */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
@@ -107,7 +140,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           </div>
 
           {/* Current Earnings */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
@@ -118,227 +151,125 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               <div className="w-16 h-6 bg-gray-700 animate-pulse rounded mb-1"></div>
             ) : (
               <h3 className="text-xl sm:text-2xl font-bold text-emerald-400 mb-1">
-                ${formatNumber(Math.max(0, userBalance - user.balance))}
+                ${formatNumber(realEarnings)}
               </h3>
             )}
             <p className="text-xs text-gray-400">
-              {totalAssetsFormatted > 0
-                ? `${((userBalance / totalAssetsFormatted) * 100).toFixed(1)}%`
+              {userInitialDeposit > 0
+                ? `${((realEarnings / userInitialDeposit) * 100).toFixed(2)}%`
                 : "0%"}{" "}
-              share
+              return
             </p>
           </div>
 
           {/* Risk Level */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className={`w-2 h-2 rounded-full ${
                   user.riskProfile === "conservative"
-                    ? "bg-green-500"
+                    ? "bg-blue-500"
                     : user.riskProfile === "moderate"
                     ? "bg-yellow-500"
-                    : user.riskProfile === "aggressive"
-                    ? "bg-red-500"
-                    : "bg-gray-500"
+                    : "bg-red-500"
                 }`}
               ></div>
-              <span className="text-xs text-gray-400 font-medium">
-                Risk Level
-              </span>
+              <span className="text-xs text-gray-400 font-medium">Risk</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white capitalize mb-1">
-              {user.riskProfile || "Not Set"}
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 capitalize">
+              {user.riskProfile}
             </h3>
-            <p className="text-xs text-gray-400">
-              {user.riskProfile === "conservative"
-                ? "Low Risk"
-                : user.riskProfile === "moderate"
-                ? "Medium Risk"
-                : user.riskProfile === "aggressive"
-                ? "High Risk"
-                : "Not Set"}
-            </p>
+            <p className="text-xs text-gray-400">Strategy</p>
           </div>
 
-          {/* APY Display - New 4th Card */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all">
+          {/* Active Strategy */}
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-emerald-600 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
               <span className="text-xs text-gray-400 font-medium">
-                Current APY
+                Strategy
               </span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-blue-400 mb-1">
-              8.2%
+            <h3 className="text-sm sm:text-base font-bold text-white mb-1">
+              {availableStrategies.find((s) => s.address === currentStrategy)
+                ?.name || "Simple Hold"}
             </h3>
-            <p className="text-xs text-gray-400">Annual Yield</p>
+            <p className="text-xs text-gray-400">Active</p>
           </div>
         </div>
 
-        {/* Overview Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Overview</h2>
-
-          {/* Portfolio Value */}
-        </div>
-
-        {/* Main Content Grid - Mobile Optimized */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          {/* Investment History - Takes more space on mobile */}
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Left Column - Funds Management */}
           <div className="lg:col-span-2">
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 sm:p-6">
-              <InvestmentChat user={user} />
-            </div>
-          </div>
-
-          {/* Funds Management - Mobile Optimized */}
-          <div>
             <FundsManagement
               userBalance={userBalance}
+              userInitialDeposit={userInitialDeposit}
+              realEarnings={realEarnings}
               onBalanceUpdate={handleBalanceUpdate}
             />
           </div>
-        </div>
 
-        {/* Active Positions */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
-          <h3 className="text-xl font-semibold text-white mb-6">
-            Active Positions
-          </h3>
+          {/* Right Column - Strategy & Performance */}
+          <div className="space-y-6">
+            {/* Strategy Overview */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">
+              <h3 className="text-white font-semibold text-lg mb-4">
+                Strategy Overview
+              </h3>
 
-          <div className="space-y-4">
-            {userBalance > 0 ? (
-              <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 hover:border-gray-600 transition-colors">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">YM</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white">
-                        YieldMaker Vault
-                      </h4>
-                      <p className="text-sm text-gray-400">
-                        {currentStrategy !==
-                        "0x0000000000000000000000000000000000000000"
-                          ? "Active Strategy Deployed"
-                          : "No Strategy (Holding cUSD)"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-white">
-                      ${formatNumber(userBalance)}
-                    </p>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-xs text-gray-400">Active</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">
-                    Total Vault: ${formatNumber(totalAssetsFormatted)} • Celo
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">
+                    Current Strategy
                   </span>
-                  <button className="text-blue-400 hover:text-blue-300 font-medium">
-                    Manage
-                  </button>
+                  <span className="text-white font-medium">
+                    {availableStrategies.find(
+                      (s) => s.address === currentStrategy
+                    )?.name || "Simple Hold"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Expected APY</span>
+                  <span className="text-emerald-400 font-medium">
+                    {apyLoading ? (
+                      <span className="animate-pulse">Loading...</span>
+                    ) : (
+                      apyDisplay || "8.2%"
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Total Assets</span>
+                  <span className="text-white font-medium">
+                    ${formatNumber(totalAssetsFormatted)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Your Share</span>
+                  <span className="text-white font-medium">
+                    {totalAssetsFormatted > 0
+                      ? `${((userBalance / totalAssetsFormatted) * 100).toFixed(
+                          1
+                        )}%`
+                      : "0%"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Aave Strategy</span>
+                  <span className="text-white font-medium">
+                    ${formatNumber(aaveStrategyBalance)}
+                  </span>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-400 mb-4">No active positions</p>
-                <p className="text-sm text-gray-500">
-                  Deposit funds to start earning yields
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Available Opportunities */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-white">
-              Available Opportunities
-            </h3>
-            <button className="text-blue-400 hover:text-blue-300 font-medium">
-              View All
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {availableStrategies.map((strategy) => {
-              const isCurrentStrategy = strategy.address === currentStrategy;
-              const riskColor =
-                strategy.risk === "low"
-                  ? "bg-green-500"
-                  : strategy.risk === "medium"
-                  ? "bg-yellow-500"
-                  : "bg-red-500";
-              const bgColor =
-                strategy.risk === "low"
-                  ? "bg-green-600"
-                  : strategy.risk === "medium"
-                  ? "bg-yellow-600"
-                  : "bg-red-600";
-
-              return (
-                <div
-                  key={strategy.address}
-                  className={`bg-gray-800 border rounded-xl p-5 hover:border-gray-600 transition-colors ${
-                    isCurrentStrategy ? "border-blue-500" : "border-gray-700"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className={`w-8 h-8 ${bgColor} rounded-lg flex items-center justify-center`}
-                      >
-                        <span className="text-white font-bold text-xs">
-                          {strategy.name.substring(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white text-sm">
-                          {strategy.name}
-                        </h4>
-                        <p className="text-xs text-gray-400">
-                          {strategy.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-green-400">
-                        {strategy.apy ? `${strategy.apy}%` : "TBD"}
-                      </p>
-                      <div className="flex items-center space-x-1">
-                        <div
-                          className={`w-1.5 h-1.5 ${riskColor} rounded-full`}
-                        ></div>
-                        <span className="text-xs text-gray-400 capitalize">
-                          {strategy.risk}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-400 mb-3">
-                    Strategy • Celo Network
-                  </div>
-                  <button
-                    className={`w-full py-2 px-3 font-medium rounded-lg text-sm transition-colors ${
-                      isCurrentStrategy
-                        ? "bg-green-600 hover:bg-green-700 text-white"
-                        : "bg-blue-600 hover:bg-blue-700 text-white"
-                    }`}
-                    disabled={isCurrentStrategy}
-                  >
-                    {isCurrentStrategy ? "Current Strategy" : "Switch To"}
-                  </button>
-                </div>
-              );
-            })}
+            {/* Strategy Manager */}
+            <StrategyManager />
           </div>
         </div>
       </div>

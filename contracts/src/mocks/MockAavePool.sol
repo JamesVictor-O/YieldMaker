@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import {DataTypes} from "@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol";
 
 /// @title MockAavePool
 /// @notice A mock lending protocol that simulates Aave V3 functionality for testing
@@ -28,8 +29,8 @@ contract MockAavePool is Ownable {
         uint256 amount
     );
 
-    // Reserve data structure similar to Aave
-    struct ReserveData {
+    // Simplified internal reserve data for our mock
+    struct InternalReserveData {
         uint256 liquidityIndex;
         uint256 currentLiquidityRate;
         uint256 lastUpdateTimestamp;
@@ -45,11 +46,11 @@ contract MockAavePool is Ownable {
     }
 
     // State variables
-    mapping(address => ReserveData) public reserves;
+    mapping(address => InternalReserveData) public reserves;
     mapping(address => mapping(address => UserReserveData)) public userReserves;
 
-    // Mock interest rate: 8.2% APY = ~0.000002537 per second (8.2% / 365 / 24 / 3600)
-    uint256 public constant MOCK_LIQUIDITY_RATE = 2537 * 1e23; // Ray format (1e27)
+    // Mock interest rate: 8.2% APY = 0.082 per year = 82000000000000000000000000 in Ray (0.082 * 1e27)
+    uint256 public constant MOCK_LIQUIDITY_RATE = 82000000000000000000000000; // 8.2% in Ray format
     uint256 public constant RAY = 1e27;
     uint256 public constant SECONDS_PER_YEAR = 365 days;
 
@@ -62,7 +63,7 @@ contract MockAavePool is Ownable {
         require(asset != address(0), "Invalid asset");
         require(aToken != address(0), "Invalid aToken");
 
-        reserves[asset] = ReserveData({
+        reserves[asset] = InternalReserveData({
             liquidityIndex: RAY, // Start with 1.0 in Ray
             currentLiquidityRate: MOCK_LIQUIDITY_RATE,
             lastUpdateTimestamp: block.timestamp,
@@ -145,10 +146,20 @@ contract MockAavePool is Ownable {
         userReserves[asset][msg.sender].scaledBalance -= scaledAmount;
         userReserves[asset][msg.sender].lastUpdateTimestamp = block.timestamp;
 
-        // Burn aTokens from user
+        // Burn proportional aTokens from user
+        uint256 aTokenBalance = MockAToken(reserves[asset].aTokenAddress)
+            .balanceOf(msg.sender);
+        uint256 aTokensToBurn = aTokenBalance; // For simplicity, burn all aTokens for max withdrawal
+        if (amount != type(uint256).max) {
+            // Calculate proportional amount for partial withdrawals
+            uint256 totalUserBalance = getUserBalance(asset, msg.sender);
+            aTokensToBurn =
+                (aTokenBalance * amountToWithdraw) /
+                totalUserBalance;
+        }
         MockAToken(reserves[asset].aTokenAddress).burn(
             msg.sender,
-            amountToWithdraw
+            aTokensToBurn
         );
 
         // Transfer tokens to user
@@ -159,13 +170,33 @@ contract MockAavePool is Ownable {
         return amountToWithdraw;
     }
 
-    /// @notice Get reserve data for an asset
+    /// @notice Get reserve data for an asset (Aave V3 compatible)
     /// @param asset The address of the underlying asset
-    /// @return The reserve data
+    /// @return The reserve data in official Aave format
     function getReserveData(
         address asset
-    ) external view returns (ReserveData memory) {
-        return reserves[asset];
+    ) external view returns (DataTypes.ReserveData memory) {
+        InternalReserveData memory internal_data = reserves[asset];
+
+        // Create a minimal but valid Aave ReserveData struct
+        DataTypes.ReserveData memory reserveData;
+        reserveData.liquidityIndex = uint128(
+            internal_data.liquidityIndex / 1e9
+        ); // Convert from Ray to uint128
+        reserveData.currentLiquidityRate = uint128(
+            internal_data.currentLiquidityRate / 1e9
+        );
+        reserveData.lastUpdateTimestamp = uint40(
+            internal_data.lastUpdateTimestamp
+        );
+        reserveData.aTokenAddress = internal_data.aTokenAddress;
+
+        // Set configuration to indicate active reserve
+        if (internal_data.isActive) {
+            reserveData.configuration.data = 1 << 56; // Set active bit
+        }
+
+        return reserveData;
     }
 
     /// @notice Get user's current balance including accrued interest
@@ -189,7 +220,7 @@ contract MockAavePool is Ownable {
     /// @notice Update the liquidity index for a reserve
     /// @param asset The address of the underlying asset
     function _updateReserveState(address asset) internal {
-        ReserveData storage reserve = reserves[asset];
+        InternalReserveData storage reserve = reserves[asset];
 
         if (block.timestamp == reserve.lastUpdateTimestamp) {
             return; // Already updated in this block
@@ -206,7 +237,7 @@ contract MockAavePool is Ownable {
     function _calculateCurrentLiquidityIndex(
         address asset
     ) internal view returns (uint256) {
-        ReserveData memory reserve = reserves[asset];
+        InternalReserveData memory reserve = reserves[asset];
 
         if (reserve.currentLiquidityRate == 0) {
             return reserve.liquidityIndex;
@@ -237,11 +268,11 @@ contract MockAavePool is Ownable {
 
     /// @notice Get the current APY for display purposes
     /// @param asset The address of the underlying asset
-    /// @return The APY in percentage (e.g., 820 for 8.2%)
+    /// @return The APY in basis points (e.g., 820 for 8.2%)
     function getCurrentAPY(address asset) external view returns (uint256) {
         uint256 rate = reserves[asset].currentLiquidityRate;
-        // Convert from Ray to percentage: rate * 100 / RAY
-        return (rate * 100) / RAY;
+        // Convert from Ray to basis points: rate * 10000 / RAY
+        return (rate * 10000) / RAY;
     }
 }
 
@@ -273,9 +304,14 @@ contract MockAToken is ERC20, Ownable {
         _burn(from, amount);
     }
 
-    /// @notice Get the balance of the user including accrued interest
+    /// @notice Get the balance of the user including accrued interest (Aave-style)
+    /// @dev This makes aToken balance grow with interest like real Aave
     function balanceOf(address account) public view override returns (uint256) {
-        return MockAavePool(POOL).getUserBalance(UNDERLYING_ASSET, account);
+        // If this account has a balance, return the interest-bearing balance from pool
+        if (super.balanceOf(account) > 0) {
+            return MockAavePool(POOL).getUserBalance(UNDERLYING_ASSET, account);
+        }
+        return 0;
     }
 
     /// @notice Total supply reflects the total supplied to the pool

@@ -35,10 +35,11 @@ export function useAvailableStrategies(): StrategyConfig[] {
   return [
     {
       type: "aave",
-      address: CONTRACT_ADDRESSES.AAVE_POOL,
+      address: CONTRACT_ADDRESSES.AAVE_STRATEGY,
       name: "Aave Strategy",
-      description: "Lend assets on Aave protocol for yield",
+      description: "Lend cUSD on Aave protocol for 8.2% APY",
       risk: "low",
+      apy: "8.2%",
     },
     {
       type: "compound",

@@ -9,7 +9,6 @@ import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import YieldmakerVaultABI from "@/contracts/abis/YieldmakerVault.json";
 import type { VaultInfo } from "@/contracts/types";
 
-// Hook for reading vault information
 export function useVaultInfo() {
   const { data: totalAssets } = useReadContract({
     address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
@@ -50,7 +49,7 @@ export function useVaultInfo() {
   } as VaultInfo;
 }
 
-// Hook for depositing into vault
+// FIXED: Hook for depositing into vault
 export function useVaultDeposit() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
@@ -58,14 +57,20 @@ export function useVaultDeposit() {
       hash,
     });
 
-  const deposit = (amount: string, receiver: string) => {
-    const assets = parseEther(amount);
-    writeContract({
-      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
-      abi: YieldmakerVaultABI,
-      functionName: "deposit",
-      args: [assets, receiver],
-    });
+  const deposit = async (amount: string, receiver: string) => {
+    try {
+      const assets = parseEther(amount);
+      // Return the promise so it can be awaited
+      return writeContract({
+        address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+        abi: YieldmakerVaultABI,
+        functionName: "deposit",
+        args: [assets, receiver as `0x${string}`],
+      });
+    } catch (err) {
+      console.error("Error in deposit function:", err);
+      throw err;
+    }
   };
 
   return {
@@ -78,7 +83,7 @@ export function useVaultDeposit() {
   };
 }
 
-// Hook for withdrawing from vault
+// FIXED: Hook for withdrawing from vault
 export function useVaultWithdraw() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
@@ -86,14 +91,27 @@ export function useVaultWithdraw() {
       hash,
     });
 
-  const withdraw = (amount: string, receiver: string, owner: string) => {
-    const assets = parseEther(amount);
-    writeContract({
-      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
-      abi: YieldmakerVaultABI,
-      functionName: "withdraw",
-      args: [assets, receiver, owner],
-    });
+  const withdraw = async (amount: string, receiver: string, owner: string) => {
+    try {
+      console.log("Calling vault withdraw with:", {
+        amount,
+        receiver,
+        owner,
+        amountWei: parseEther(amount).toString()
+      });
+
+      const assets = parseEther(amount);
+      
+      return writeContract({
+        address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+        abi: YieldmakerVaultABI,
+        functionName: "withdraw",
+        args: [assets, receiver as `0x${string}`, owner as `0x${string}`],
+      });
+    } catch (err) {
+      console.error("Error in withdraw function:", err);
+      throw err;
+    }
   };
 
   return {
@@ -114,13 +132,18 @@ export function useSetStrategy() {
       hash,
     });
 
-  const setStrategy = (strategyAddress: string) => {
-    writeContract({
-      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
-      abi: YieldmakerVaultABI,
-      functionName: "setStrategy",
-      args: [strategyAddress],
-    });
+  const setStrategy = async (strategyAddress: string) => {
+    try {
+      return writeContract({
+        address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+        abi: YieldmakerVaultABI,
+        functionName: "setStrategy",
+        args: [strategyAddress as `0x${string}`],
+      });
+    } catch (err) {
+      console.error("Error in setStrategy function:", err);
+      throw err;
+    }
   };
 
   return {
@@ -141,12 +164,17 @@ export function useEmergencyWithdraw() {
       hash,
     });
 
-  const emergencyWithdraw = () => {
-    writeContract({
-      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
-      abi: YieldmakerVaultABI,
-      functionName: "emergencyWithdraw",
-    });
+  const emergencyWithdraw = async () => {
+    try {
+      return writeContract({
+        address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+        abi: YieldmakerVaultABI,
+        functionName: "emergencyWithdraw",
+      });
+    } catch (err) {
+      console.error("Error in emergencyWithdraw function:", err);
+      throw err;
+    }
   };
 
   return {
@@ -159,36 +187,75 @@ export function useEmergencyWithdraw() {
   };
 }
 
+// Hook for checking vault balance
 export function useVaultBalance() {
   const { address } = useAccount();
   const {
     data: balance,
     isLoading,
     error,
+    refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
+    address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
     abi: YieldmakerVaultABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { enabled: !!address },
+    query: { 
+      enabled: !!address,
+      refetchInterval: 10000, // Refetch every 10 seconds
+    },
   });
-  return { balance: balance || BigInt(0), isLoading, error };
+  
+  return { 
+    balance: balance || BigInt(0), 
+    isLoading, 
+    error,
+    refetch
+  };
 }
 
+// Hook for sending vault tokens
 export function useVaultSend() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
 
-  const send = (to: string, amount: string) => {
-    const shares = parseEther(amount);
-    writeContract({
-      address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT,
-      abi: YieldmakerVaultABI,
-      functionName: "transfer",
-      args: [to, shares],
-    });
+  const send = async (to: string, amount: string) => {
+    try {
+      const shares = parseEther(amount);
+      
+      return writeContract({
+        address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+        abi: YieldmakerVaultABI,
+        functionName: "transfer",
+        args: [to as `0x${string}`, shares],
+      });
+    } catch (err) {
+      console.error("Error in send function:", err);
+      throw err;
+    }
   };
 
-  return { send, hash, isPending, isConfirming, isConfirmed, error };
+  return { 
+    send, 
+    hash, 
+    isPending, 
+    isConfirming, 
+    isConfirmed, 
+    error 
+  };
+}
+
+// Additional hook to check if vault is paused
+export function useVaultStatus() {
+  const { data: paused, refetch } = useReadContract({
+    address: CONTRACT_ADDRESSES.YIELDMAKER_VAULT as `0x${string}`,
+    abi: YieldmakerVaultABI,
+    functionName: "paused",
+  });
+
+  return {
+    paused: paused || false,
+    refetch
+  };
 }
