@@ -12,10 +12,20 @@ contract YieldmakerVault is ERC4626, Ownable {
     IStrategy public strategy;
     bool public paused;
 
+    // Optional Self verification registry and per-strategy gating
+    interface ISelfVerificationRegistry {
+        function isCreatorVerified(address creator) external view returns (bool);
+    }
+
+    ISelfVerificationRegistry public verificationRegistry;
+    mapping(address => bool) public strategyRequiresVerification;
+
     // events
     event StrategyUpdated(address indexed newStrategy);
     event Paused(address account);
     event Unpaused(address account);
+    event VerificationRegistryUpdated(address indexed registry);
+    event StrategyVerificationRequirementUpdated(address indexed strategy, bool required);
 
     // constructor 
     constructor(
@@ -47,6 +57,19 @@ contract YieldmakerVault is ERC4626, Ownable {
             strategy.invest(vaultBalance);
         }
     }
+
+    // Admin: configure Self verification registry (optional)
+    function setVerificationRegistry(address _registry) external onlyOwner {
+        verificationRegistry = ISelfVerificationRegistry(_registry);
+        emit VerificationRegistryUpdated(_registry);
+    }
+
+    // Admin: mark strategies that require verification to deposit
+    function setStrategyVerificationRequirement(address _strategy, bool _required) external onlyOwner {
+        require(_strategy != address(0), "Invalid strategy");
+        strategyRequiresVerification[_strategy] = _required;
+        emit StrategyVerificationRequirementUpdated(_strategy, _required);
+    }
         
     function pause() external onlyOwner {
         paused = true;
@@ -66,6 +89,16 @@ contract YieldmakerVault is ERC4626, Ownable {
         uint256 assets,
         address receiver
     ) public override whenNotPaused returns (uint256) {
+        // If current strategy requires verification, enforce Self verification for depositor
+        if (
+            address(verificationRegistry) != address(0) &&
+            strategyRequiresVerification[address(strategy)]
+        ) {
+            require(
+                verificationRegistry.isCreatorVerified(msg.sender),
+                "Verification required for this strategy"
+            );
+        }
         uint256 shares = super.deposit(assets, receiver);
         
         // Transfer the assets from vault to strategy, then invest

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { formatEther } from "viem";
 import { User } from "@/types";
 import WelcomeFlow from "./WelcomeFlow";
@@ -9,6 +10,7 @@ import { useAvailableStrategies } from "@/hooks/contracts/useStrategies";
 import { useMockAavePoolAPY } from "@/hooks/contracts/useMockAavePool";
 import { useAaveStrategyBalance } from "@/hooks/contracts/useAaveStrategy";
 import { useAccount } from "wagmi";
+import { useIsVerified } from "@/hooks/use-verification";
 
 interface MainDashboardProps {
   user: User;
@@ -29,8 +31,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     useVaultBalance();
   const { totalAssets, strategy: currentStrategy } = useVaultInfo();
   const { address } = useAccount();
+  const { data: isVerified = false, isLoading: isVerifiedLoading } = useIsVerified(address as `0x${string}`);
 
   const availableStrategies = useAvailableStrategies();
+  const router = useRouter();
 
   // Get real-time APY from our deployed MockAavePool
   const { apyDisplay, isLoading: apyLoading } = useMockAavePoolAPY();
@@ -72,6 +76,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       }
     }
   }, [address, vaultBalanceFormatted]);
+
+  // Self verification status is fully on-chain now via useIsVerified
 
   // Calculate real earnings
   const realEarnings = Math.max(0, userBalance - userInitialDeposit);
@@ -121,7 +127,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   return (
     <div className="min-h-screen text-white">
-      {/* Mobile-First Container */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* Top Stats Cards - Clean Design */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -212,6 +217,21 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
           {/* Right Column - Strategy & Performance */}
           <div className="space-y-6">
+            {/* Self Verification Prompt (shown when not verified on-chain) */}
+            {!isVerifiedLoading && !isVerified && (
+              <div className="bg-amber-900/20 border border-amber-800/30 rounded-2xl p-6">
+                <h3 className="text-white font-semibold text-lg mb-2">Get Verified with Self</h3>
+                <p className="text-sm text-amber-200/90 mb-4">
+                  Verify your humanity to unlock more yield opportunities. You can do this anytime.
+                </p>
+                <button
+                  onClick={() => router.push("/verify-self")}
+                  className="px-4 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                >
+                  Get Verified with Self
+                </button>
+              </div>
+            )}
             {/* Strategy Overview */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">
               <h3 className="text-white font-semibold text-lg mb-4">
