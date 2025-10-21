@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import { saveOnboardingAnswers } from "../../utils/api";
 import { User } from "../../types";
 import { ChevronLeft, ChevronRight, CheckCircle, Circle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface WelcomeFlowProps {
   user: User;
@@ -13,6 +14,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const { address } = useAccount();
+  const router = useRouter();
 
   const questions = [
     {
@@ -79,25 +81,50 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
     },
   ];
 
+  const totalSteps = questions.length + 1; // extra step for optional Self verification
+
   const handleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
+  };
+
+  const finalizeOnboarding = async (selfVerified: boolean) => {
+    const mergedAnswers = { ...answers, self_verified: selfVerified ? "true" : "false" };
+    try {
+      await saveOnboardingAnswers(mergedAnswers, address);
+    } catch (e) {
+      console.error("Failed to save onboarding data:", e);
+    }
+    const riskProfile = calculateRiskProfile(mergedAnswers);
+    if (address) {
+      try {
+        const localStorageKey = `onboarding_${address}`;
+        const onboardingStatus = {
+          hasCompletedOnboarding: true,
+          riskProfile,
+          selfVerified,
+        };
+        localStorage.setItem(localStorageKey, JSON.stringify(onboardingStatus));
+      } catch {}
+    }
+    onComplete(riskProfile);
   };
 
   const handleNext = async () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      // Save answers to backend
-      try {
-        await saveOnboardingAnswers(answers, address);
-      } catch (e) {
-        // Optionally handle error (show toast, etc)
-        console.error("Failed to save onboarding data:", e);
-      }
-      // Calculate risk profile based on answers
-      const riskProfile = calculateRiskProfile(answers);
-      onComplete(riskProfile);
+    } else if (currentStep === questions.length - 1) {
+      // Move to optional Self verification step
+      setCurrentStep(currentStep + 1);
     }
+  };
+
+  const handleSelfVerify = async () => {
+    // Navigate to verification page; onboarding completion will be updated
+    router.push("/verify-self");
+  };
+
+  const handleSkipSelf = async () => {
+    await finalizeOnboarding(false);
   };
 
   const handleBack = () => {
@@ -119,9 +146,10 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
     return "moderate";
   };
 
-  const currentQuestion = questions[currentStep];
-  const selectedAnswer = answers[currentQuestion.id];
-  const progressPercentage = ((currentStep + 1) / questions.length) * 100;
+  const isQuestionStep = currentStep < questions.length;
+  const currentQuestion = isQuestionStep ? questions[currentStep] : undefined;
+  const selectedAnswer = currentQuestion ? answers[currentQuestion.id] : undefined;
+  const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
 
   return (
     <div className="md:h-screen sm:px-6 lg:px-8 flex md:items-center md:justify-center mt-15 md:mt-0">
@@ -132,7 +160,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
           <div className="px-6 py-6 sm:px-8 md:border-b border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-white md:text-gray-300">
-                Step {currentStep + 1} of {questions.length}
+                Step {currentStep + 1} of {totalSteps}
               </span>
               <span className="text-sm font-medium text-emerald-400">
                 {Math.round(progressPercentage)}% Complete
@@ -149,7 +177,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
 
             {/* Step Indicators */}
             <div className="flex justify-between mt-2">
-              {questions.map((_, index) => (
+              {Array.from({ length: totalSteps }).map((_, index) => (
                 <div
                   key={index}
                   className={`flex items-center justify-center w-6 h-6 rounded-full border-2 transition-all duration-300 ${
@@ -168,54 +196,84 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
             </div>
           </div>
 
-          {/* Question Section */}
+          {/* Content Section */}
           <div className="px-6 md:py-8 sm:px-8">
-            <div className="text-center mb-4 md:mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 md:mb-3">
-                {currentQuestion.question}
-              </h2>
-              <p className="text-white md:text-gray-400 text-sm sm:text-base">
-                {currentQuestion.subtitle}
-              </p>
-            </div>
+            {isQuestionStep && currentQuestion ? (
+              <>
+                <div className="text-center mb-4 md:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 md:mb-3">
+                    {currentQuestion.question}
+                  </h2>
+                  <p className="text-white md:text-gray-400 text-sm sm:text-base">
+                    {currentQuestion.subtitle}
+                  </p>
+                </div>
 
-            {/* Options */}
-            <div className="md:space-y-4 space-y-2">
-              {currentQuestion.options.map((option) => {
-                const isSelected = selectedAnswer === option.value;
-                return (
+                {/* Options */}
+                <div className="md:space-y-4 space-y-2">
+                  {currentQuestion.options.map((option) => {
+                    const isSelected = selectedAnswer === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() =>
+                          handleAnswer(currentQuestion.id, option.value)
+                        }
+                        className={`w-full p-4 sm:p-6 text-left border-2 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-500/10"
+                            : "border-gray-600 bg-gray-700 hover:border-gray-500 hover:bg-gray-600"
+                        }`}
+                      >
+                        <div className="flex items-start space-x-4">
+                          <div className="flex-shrink-0 mt-1">
+                            {isSelected ? (
+                              <CheckCircle className="w-5 h-5 text-emerald-400" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-grow">
+                            <div className="font-semibold text-white mb-1">
+                              {option.label}
+                            </div>
+                            <div className="text-sm text-gray-300">
+                              {option.desc}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-4 md:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 md:mb-3">
+                    Verify with Self (optional)
+                  </h2>
+                  <p className="text-white md:text-gray-400 text-sm sm:text-base">
+                    Get access to more yield opportunities by proving you are a unique human. You can skip this and do it later.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 sm:justify-center">
                   <button
-                    key={option.value}
-                    onClick={() =>
-                      handleAnswer(currentQuestion.id, option.value)
-                    }
-                    className={`w-full p-4 sm:p-6 text-left border-2 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
-                      isSelected
-                        ? "border-emerald-500 bg-emerald-500/10"
-                        : "border-gray-600 bg-gray-700 hover:border-gray-500 hover:bg-gray-600"
-                    }`}
+                    onClick={handleSelfVerify}
+                    className="px-4 py-3 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
                   >
-                    <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 mt-1">
-                        {isSelected ? (
-                          <CheckCircle className="w-5 h-5 text-emerald-400" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-grow">
-                        <div className="font-semibold text-white mb-1">
-                          {option.label}
-                        </div>
-                        <div className="text-sm text-gray-300">
-                          {option.desc}
-                        </div>
-                      </div>
-                    </div>
+                    Verify with Self
                   </button>
-                );
-              })}
-            </div>
+                  <button
+                    onClick={handleSkipSelf}
+                    className="px-4 py-3 rounded-xl font-semibold bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Footer */}
@@ -234,22 +292,39 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 <span>Back</span>
               </button>
 
-              <button
-                onClick={handleNext}
-                disabled={!selectedAnswer}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold transition-all duration-200 transform ${
-                  selectedAnswer
-                    ? "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 shadow-lg"
-                    : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                <span>
-                  {currentStep === questions.length - 1
-                    ? "Complete Setup"
-                    : "Continue"}
-                </span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
+              {isQuestionStep ? (
+                <button
+                  onClick={handleNext}
+                  disabled={!selectedAnswer}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold transition-all duration-200 transform ${
+                    selectedAnswer
+                      ? "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 shadow-lg"
+                      : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  <span>
+                    {currentStep === questions.length - 1
+                      ? "Continue"
+                      : "Continue"}
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSkipSelf}
+                    className="px-3 py-2 rounded-xl font-semibold bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+                  >
+                    Skip for now
+                  </button>
+                  <button
+                    onClick={handleSelfVerify}
+                    className="px-3 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                  >
+                    Verify with Self
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
