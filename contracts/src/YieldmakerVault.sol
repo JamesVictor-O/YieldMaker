@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -8,14 +7,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./IStrategy.sol";
 
+// Optional Self verification registry interface
+interface ISelfVerificationRegistry {
+    function isCreatorVerified(address creator) external view returns (bool);
+}
+
 contract YieldmakerVault is ERC4626, Ownable {
     IStrategy public strategy;
     bool public paused;
-
-    // Optional Self verification registry and per-strategy gating
-    interface ISelfVerificationRegistry {
-        function isCreatorVerified(address creator) external view returns (bool);
-    }
 
     ISelfVerificationRegistry public verificationRegistry;
     mapping(address => bool) public strategyRequiresVerification;
@@ -25,9 +24,12 @@ contract YieldmakerVault is ERC4626, Ownable {
     event Paused(address account);
     event Unpaused(address account);
     event VerificationRegistryUpdated(address indexed registry);
-    event StrategyVerificationRequirementUpdated(address indexed strategy, bool required);
+    event StrategyVerificationRequirementUpdated(
+        address indexed strategy,
+        bool required
+    );
 
-    // constructor 
+    // constructor
     constructor(
         IERC20 _asset,
         address _strategy
@@ -65,12 +67,15 @@ contract YieldmakerVault is ERC4626, Ownable {
     }
 
     // Admin: mark strategies that require verification to deposit
-    function setStrategyVerificationRequirement(address _strategy, bool _required) external onlyOwner {
+    function setStrategyVerificationRequirement(
+        address _strategy,
+        bool _required
+    ) external onlyOwner {
         require(_strategy != address(0), "Invalid strategy");
         strategyRequiresVerification[_strategy] = _required;
         emit StrategyVerificationRequirementUpdated(_strategy, _required);
     }
-        
+
     function pause() external onlyOwner {
         paused = true;
         emit Paused(msg.sender);
@@ -100,11 +105,11 @@ contract YieldmakerVault is ERC4626, Ownable {
             );
         }
         uint256 shares = super.deposit(assets, receiver);
-        
+
         // Transfer the assets from vault to strategy, then invest
         IERC20(asset()).transfer(address(strategy), assets);
         strategy.invest(assets);
-        
+
         return shares;
     }
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@aave/core-v3": "^1.19.3"
+    "@aave/core-v3": "^1.19.3",
+    "@selfxyz/contracts": "^1.2.0"
   }
 }

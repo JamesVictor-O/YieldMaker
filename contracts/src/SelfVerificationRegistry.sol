@@ -16,7 +16,7 @@ contract SelfVerificationRegistry is Ownable, SelfVerificationRoot {
     // Tracks verification status per user
     mapping(address => bool) public verifiedCreators;
     // Prevents proof replay using nullifier
-    mapping(bytes32 => bool) public usedNullifiers;
+    mapping(uint256 => bool) public usedNullifiers;
     // Verification configuration ID (generated via tools.self.xyz)
     bytes32 public verificationConfigId;
 
@@ -26,7 +26,10 @@ contract SelfVerificationRegistry is Ownable, SelfVerificationRoot {
         address identityVerificationHubV2Address,
         uint256 scopeValue,
         bytes32 _verificationConfigId
-    ) Ownable(msg.sender) SelfVerificationRoot(identityVerificationHubV2Address, scopeValue) {
+    )
+        Ownable(msg.sender)
+        SelfVerificationRoot(identityVerificationHubV2Address, scopeValue)
+    {
         verificationConfigId = _verificationConfigId;
     }
 
@@ -80,7 +83,9 @@ contract SelfVerificationRegistry is Ownable, SelfVerificationRoot {
         return verifiedCreators[creator];
     }
 
-    function getVerificationInfo(address creator)
+    function getVerificationInfo(
+        address creator
+    )
         external
         view
         returns (
@@ -99,5 +104,3 @@ contract SelfVerificationRegistry is Ownable, SelfVerificationRoot {
             : "Unverified - Complete Self verification";
     }
 }
-
-

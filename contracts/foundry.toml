@@ -2,6 +2,9 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+remappings = [
+    "@selfxyz/contracts/=node_modules/@selfxyz/contracts/"
+]
 
 [rpc_endpoints]
 alfajores = "https://alfajores-forno.celo-testnet.org"
