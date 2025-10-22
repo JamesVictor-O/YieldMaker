@@ -97,6 +97,13 @@ export function useSubmitVerification() {
   const submitVerification = useMutation({
     mutationFn: async (params: { proofPayload: string; userContextData: string }) => {
       if (!writeContract || !contractAddress) throw new Error('Contract not available');
+      
+      console.log('🛡️ Submitting verification to contract:', {
+        contractAddress,
+        proofPayload: params.proofPayload.substring(0, 20) + '...',
+        userContextData: params.userContextData.substring(0, 20) + '...'
+      });
+
       return writeContract({
         address: contractAddress,
         abi: CONTRACT_CONFIG.abi,
@@ -105,11 +112,15 @@ export function useSubmitVerification() {
       });
     },
     onSuccess: () => {
+      console.log('✅ Verification submitted successfully');
       if (address) {
         queryClient.invalidateQueries({ queryKey: ['isCreatorVerified', address] });
         queryClient.invalidateQueries({ queryKey: ['getVerificationInfo', address] });
         queryClient.invalidateQueries({ queryKey: ['multipleVerificationStatus'] });
       }
+    },
+    onError: (error) => {
+      console.error('❌ Verification submission failed:', error);
     },
   });
 

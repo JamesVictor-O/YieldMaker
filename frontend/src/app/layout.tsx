@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import Web3Provider from "@/components/Providers/Web3Provider";
+import { ToastContainer } from "@/components/ui/toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,6 +41,7 @@ export default function RootLayout({
       >
         <Web3Provider>
           {children}
+          <ToastContainer />
         </Web3Provider>
       </body>
     </html>

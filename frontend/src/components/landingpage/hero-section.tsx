@@ -24,7 +24,7 @@ const HeroSection = () => {
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-2 sm:px-0 animate-fade-in-up delay-400">
               Earn from DeFi without the complexity{" "}
               <span className="font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                FiYield&apos;s AI
+                YieldMaker&apos;s AI
               </span>{" "}
               does all the work for you. You just deposit and relax.
             </p>
