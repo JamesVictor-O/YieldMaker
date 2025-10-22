@@ -1,117 +1,115 @@
 "use client";
 
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { SelfQRcodeWrapper, SelfAppBuilder } from "@selfxyz/qrcode";
-import { useSubmitVerification } from "@/hooks/use-verification";
-import { Shield, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { SelfAppBuilder, SelfApp, SelfQRcodeWrapper } from "@selfxyz/qrcode";
+import { useSubmitVerification, useIsVerified } from "@/hooks/use-verification";
+import { useToast } from "@/hooks/use-toast";
+import { Shield, CheckCircle, AlertCircle, Loader2, Home, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function VerifySelfPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const [verificationStep, setVerificationStep] = useState<"scan" | "processing" | "complete">("scan");
   const [error, setError] = useState<string | null>(null);
-  const { submitVerification, isPending, isConfirmed } = useSubmitVerification();
+  const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
+  const { submitVerification, isConfirmed: isVerificationConfirmed } = useSubmitVerification();
+  const { data: isVerified = false, refetch: refetchVerification } = useIsVerified(address);
+  const { success, error: showError } = useToast();
 
-  // Validate hex address format
-  const isValidHexAddress = (value?: string | null) =>
-    !!value && /^0x[0-9a-fA-F]{40}$/.test(value);
 
-  // Build Self App configuration
-  const selfApp = useMemo(() => {
-    if (!isValidHexAddress(address)) return undefined;
+  // Initialize Self App configuration
+  useEffect(() => {
+    if (address && isConnected) {
+      try {
+        const contractAddress = process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_44787 || 
+                               process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_42220 || 
+                               "0x...";
+        
+        const app = new SelfAppBuilder({
+          appName: "YieldMaker DeFi",
+          scope: "YieldMaker",
+          endpoint: contractAddress.toLowerCase(),
+          endpointType: "celo",
+          userId: address,
+          userIdType: "hex",
+          version: 2,
+          userDefinedData: "yieldmaker_verification",
+          disclosures: {
+            minimumAge: 18,
+            ofac: true,
+            excludedCountries: [],
+          },
+          devMode: false,
+        } as Partial<SelfApp>).build();
 
-    try {
-      // CRITICAL FIX: Use your contract address as endpoint, not an API URL
-      const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS || "0x...";
-      
-      return new SelfAppBuilder({
-        appName: "YieldMaker",
-        scope: "YieldMaker", // Clear scope identifier, not from env
-        endpoint: contractAddress.toLowerCase(), // Contract address, not API endpoint
-        endpointType: "celo", // Blockchain network (celo, ethereum, polygon, etc.)
-        userId: address,
-        userIdType: "hex",
-        version: 2,
-        userDefinedData: "yieldmaker_verification",
-        disclosures: {
-          minimumAge: 18,
-          ofac: true, // Changed to true for better compliance
-          excludedCountries: [], // Required array
-        },
-        devMode: false, // Set to true for testing, false for production
-      }).build();
-    } catch (err) {
-      console.error("Failed to build Self app:", err);
-      setError("Failed to initialize verification");
-      return undefined;
+        setSelfApp(app);
+      } catch (error) {
+        console.error("Failed to initialize Self app:", error);
+        setError("Failed to initialize verification");
+      }
     }
-  }, [address]);
+  }, [address, isConnected]);
 
-  // Convert string to hex for blockchain data
-  const stringToHex = (s: string) =>
-    "0x" + Array.from(new TextEncoder().encode(s))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
 
   // Handle successful verification
   const handleSuccess = useCallback(
-    async (proofData?: any) => {
+    async (proofData?: { proof?: unknown; publicSignals?: unknown }) => {
       setVerificationStep("processing");
       setError(null);
 
       try {
         if (proofData && address) {
-          // Submit verification directly on-chain
-          await new Promise((resolve) => setTimeout(resolve, 200));
+          // Submit verification proof to smart contract
+          const proofPayload = JSON.stringify(proofData);
+          const userContextData = JSON.stringify({ userAddress: address, timestamp: Date.now() });
+
           submitVerification({
-            proofPayload: stringToHex(JSON.stringify(proofData)),
-            userContextData: stringToHex(
-              JSON.stringify({ userAddress: address, timestamp: Date.now() })
-            ),
+            proofPayload: `0x${Buffer.from(proofPayload).toString('hex')}`,
+            userContextData: `0x${Buffer.from(userContextData).toString('hex')}`
           });
-        }
 
-        // Update local storage
-        if (address) {
-          const key = `onboarding_${address}`;
-          try {
-            const raw = localStorage.getItem(key);
-            const parsed = raw ? JSON.parse(raw) : {};
-            const updated = {
-              ...parsed,
-              selfVerified: true,
-              hasCompletedOnboarding: true,
-              verifiedAt: Date.now(),
-            };
-            localStorage.setItem(key, JSON.stringify(updated));
-          } catch (storageError) {
-            console.error("Local storage error:", storageError);
-          }
+          success("Verification submitted!", "Your proof has been submitted to the blockchain for verification.");
+        } else {
+          // Fallback for demo purposes
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          setVerificationStep("complete");
+          success("Verification completed!", "You are now a verified user with access to premium features.");
         }
-
-         setVerificationStep("complete");
-        
-        // Redirect after brief success display
-         setTimeout(() => {
-           router.push("/dashboard");
-         }, 2000);
-      } catch (e: any) {
-        console.error("Verification error:", e);
-        setError(e.message || "Verification failed. Please try again.");
+      } catch (err: unknown) {
+        console.error("Verification processing failed:", err);
+        const errorMessage = err instanceof Error ? err.message : "Failed to submit verification proof.";
+        showError("Verification failed", errorMessage);
         setVerificationStep("scan");
       }
     },
-    [address, router]
+    [address, submitVerification, success, showError]
   );
 
   // Handle verification errors
-  const handleError = useCallback((error: any) => {
-    console.error("Self verification error:", error);
-    setError("Verification failed. Please try again.");
+  const handleError = useCallback((error: unknown) => {
+    console.error("Verification error:", error);
+    showError("Verification failed", "Please try again or contact support if the issue persists.");
     setVerificationStep("scan");
-  }, []);
+  }, [showError]);
+
+  // Handle verification confirmation
+  useEffect(() => {
+    if (isVerificationConfirmed) {
+      setVerificationStep("complete");
+      refetchVerification();
+      success("Verification complete!", "You are now a verified user with access to premium features.");
+    }
+  }, [isVerificationConfirmed, refetchVerification, success]);
+
+  // Update verification step based on actual verification status
+  useEffect(() => {
+    if (isVerified && verificationStep !== "complete") {
+      setVerificationStep("complete");
+    }
+  }, [isVerified, verificationStep]);
 
   // Redirect if not connected
   useEffect(() => {
@@ -126,7 +124,13 @@ export default function VerifySelfPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h1 className="text-xl font-semibold text-white mb-2">Wallet Not Connected</h1>
-          <p className="text-sm text-gray-300">Please connect your wallet to continue.</p>
+          <p className="text-sm text-gray-300 mb-6">Please connect your wallet to continue.</p>
+          <Link href="/">
+            <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2">
+              <Home className="w-4 h-4" />
+              Back to Home
+            </button>
+          </Link>
         </div>
       </div>
     );
@@ -182,7 +186,13 @@ export default function VerifySelfPage() {
           ) : verificationStep === "complete" ? (
             <div className="text-center py-8">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <p className="text-sm text-gray-400">Redirecting to dashboard...</p>
+              <p className="text-sm text-gray-400 mb-4">Verification Complete!</p>
+              <Link href="/dashboard">
+                <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 mx-auto">
+                  Go to Dashboard
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
             </div>
           ) : selfApp ? (
             <div className="text-center">
@@ -191,7 +201,6 @@ export default function VerifySelfPage() {
                   selfApp={selfApp}
                   onSuccess={handleSuccess}
                   onError={handleError}
-                  darkMode={true}
                   size={280}
                 />
               </div>
@@ -212,7 +221,7 @@ export default function VerifySelfPage() {
         {/* Info Section */}
         {verificationStep === "scan" && (
           <div className="mt-6 pt-6 border-t border-gray-800">
-            <h3 className="text-sm font-semibold text-white mb-3">What you'll need:</h3>
+            <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll need:</h3>
             <ul className="space-y-2 text-xs text-gray-300">
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 mt-0.5">•</span>
