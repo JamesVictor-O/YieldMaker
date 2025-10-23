@@ -1,0 +1,21 @@
+{
+    "frame": {
+      "name": "YieldMaker",
+      "version": "1",
+      "iconUrl": "https://yieldmaker.netlify.app/Logo2.png",
+      "homeUrl": "https://yieldmaker.netlify.app",
+      "imageUrl": "https://yieldmaker.netlify.app/Logo2.png",
+      "splashImageUrl": "https://yieldhttps://yieldmaker.netlify.app/Logo2.pngmaker.netlify.app/splash.png",
+      "splashBackgroundColor": "#00B386",
+      "webhookUrl": "https://yieldmaker.netlify.app/api/webhook",
+      "description": "YieldMaker bridges the gap, turning passive crypto holders into active DeFi yield earners.",
+      "primaryCategory": "finance",
+      "heroImageUrl": "https://yieldmaker.netlify.app/Logo2.png ",
+      "subtitle": "Your gateway from holding tokens to earning from them"
+    },
+    "accountAssociation": {
+    "header": "eyJmaWQiOjEwNTkzNDUsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg2MDY0NkMyRWM3NjIzRDM2NTU3NTg1MDU4M2Y3QTc0QkI0NGM2OWRiIn0",
+    "payload": "eyJkb21haW4iOiJmaS15aWVsZC52ZXJjZWwuYXBwIn0",
+    "signature": "dfDQHHUXnquOImftKMjn0HGlk6FDGMPLWZBH7TOBi6RJse5ey4lIAnx9a2+OEov5JoODxkB7LiunktCy5uHIIxw="
+  }
+  }
