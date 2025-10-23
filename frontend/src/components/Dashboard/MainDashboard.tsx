@@ -11,6 +11,7 @@ import { useMockAavePoolAPY } from "@/hooks/contracts/useMockAavePool";
 import { useAaveStrategyBalance } from "@/hooks/contracts/useAaveStrategy";
 import { useAccount } from "wagmi";
 import { useIsVerified } from "@/hooks/use-verification";
+import { useContractAddress } from "@/hooks/use-contract";
 
 interface MainDashboardProps {
   user: User;
@@ -32,6 +33,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   const { totalAssets, strategy: currentStrategy } = useVaultInfo();
   const { address } = useAccount();
   const { data: isVerified = false, isLoading: isVerifiedLoading } = useIsVerified(address as `0x${string}`);
+  const registryAddress = useContractAddress();
 
   const availableStrategies = useAvailableStrategies();
   const router = useRouter();
@@ -217,8 +219,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
           {/* Right Column - Strategy & Performance */}
           <div className="space-y-6">
-            {/* Self Verification Prompt (shown when not verified on-chain) */}
-            {!isVerifiedLoading && !isVerified && (
+            {/* Self Verification Prompt (shown when not verified on-chain or registry not configured) */}
+            {(!isVerified || !registryAddress) && (
               <div className="bg-amber-900/20 border border-amber-800/30 rounded-2xl p-6">
                 <h3 className="text-white font-semibold text-lg mb-2">Get Verified with Self</h3>
                 <p className="text-sm text-amber-200/90 mb-4">

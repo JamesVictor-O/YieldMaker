@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 
-export default function VerifySelfCallbackPage() {
+function CallbackContent() {
   const params = useSearchParams();
   const router = useRouter();
   const { address } = useAccount();
@@ -50,6 +50,14 @@ export default function VerifySelfCallbackPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifySelfCallbackPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+      <CallbackContent />
+    </Suspense>
   );
 }
 

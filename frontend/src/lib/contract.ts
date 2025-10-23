@@ -36,10 +36,10 @@ export const CONTRACT_CONFIG = {
   ],
   // Addresses per chain; set via envs or update after deployment
   addresses: {
-    44787: (process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_44787 || undefined) as
+    44787: (process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 || undefined) as
       | `0x${string}`
       | undefined, // Celo Alfajores
-    42220: (process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_42220 || undefined) as
+    42220: (process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 || undefined) as
       | `0x${string}`
       | undefined, // Celo Mainnet
   },

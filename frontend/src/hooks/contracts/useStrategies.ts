@@ -39,7 +39,7 @@ export function useAvailableStrategies(): StrategyConfig[] {
       name: "Aave Strategy",
       description: "Lend cUSD on Aave protocol for 8.2% APY",
       risk: "low",
-      apy: "8.2%",
+      apy: 8.2,
     },
     {
       type: "compound",
@@ -64,7 +64,7 @@ export function useAvailableStrategies(): StrategyConfig[] {
     },
     {
       type: "null",
-      address: CONTRACT_ADDRESSES.NULL_STRATEGY,
+      address: "0x0000000000000000000000000000000000000000",
       name: "No Strategy",
       description: "Hold assets without yield generation",
       risk: "low",
