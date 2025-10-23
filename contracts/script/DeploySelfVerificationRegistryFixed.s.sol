@@ -12,8 +12,8 @@ contract DeploySelfVerificationRegistryFixed is Script {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         
         // Fixed values for Celo Alfajores
-        address constant SELF_HUB_ADDRESS = 0x68c931C9a534D37aa78094877F46fE46a49F1A51;
-        bytes32 constant VERIFICATION_CONFIG_ID = 0x7b6436b0c98f62380866d9432c2af0ee08ce16a171bda6951aecd95ee1307d61;
+        address SELF_HUB_ADDRESS = 0x68c931C9a534D37aa78094877F46fE46a49F1A51;
+        bytes32 VERIFICATION_CONFIG_ID = 0x7b6436b0c98f62380866d9432c2af0ee08ce16a171bda6951aecd95ee1307d61;
         
         // You need to calculate the scope hash for "YieldMaker"
         // This is typically done with: keccak256(abi.encodePacked("YieldMaker"))
