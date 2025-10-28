@@ -78,26 +78,26 @@ const AIChat: React.FC<AIChatProps> = ({ user }) => {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[600px] bg-white rounded-2xl border border-gray-200">
+    <div className="flex flex-col h-[calc(100vh-12rem)] sm:h-[600px] bg-gray-900 rounded-2xl border border-gray-800">
       {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
-        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+      <div className="p-4 border-b border-gray-800 flex items-center gap-3">
+        <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
           <span className="text-white font-semibold">AI</span>
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Yieldmaker AI</h3>
-          <p className="text-sm text-gray-500">Your DeFi investment assistant</p>
+          <h3 className="font-semibold text-white">YieldMaker AI</h3>
+          <p className="text-sm text-gray-400">Your DeFi investment assistant</p>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] p-3 rounded-2xl ${
-              message.type === 'user' 
-                ? 'bg-blue-600 text-white rounded-br-sm' 
-                : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+              message.type === 'user'
+                ? 'bg-emerald-600 text-white rounded-br-sm'
+                : 'bg-gray-800 text-gray-100 rounded-bl-sm'
             }`}>
               <p>{message.content}</p>
               {message.suggestions && (
@@ -106,7 +106,7 @@ const AIChat: React.FC<AIChatProps> = ({ user }) => {
                     <button
                       key={index}
                       onClick={() => handleSuggestionClick(suggestion)}
-                      className="block w-full text-left p-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors"
+                      className="block w-full text-left p-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
                     >
                       {suggestion}
                     </button>
@@ -119,11 +119,11 @@ const AIChat: React.FC<AIChatProps> = ({ user }) => {
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 p-3 rounded-2xl rounded-bl-sm">
+            <div className="bg-gray-800 p-3 rounded-2xl rounded-bl-sm">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
               </div>
             </div>
           </div>
@@ -132,20 +132,20 @@ const AIChat: React.FC<AIChatProps> = ({ user }) => {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex space-x-2">
+      <div className="sticky bottom-0 p-3 sm:p-4 border-t border-gray-800 bg-gray-900">
+        <div className="flex gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputValue)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(inputValue)}
             placeholder="Ask me anything about DeFi yields..."
-            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
           <button
             onClick={() => handleSendMessage(inputValue)}
             disabled={!inputValue.trim()}
-            className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

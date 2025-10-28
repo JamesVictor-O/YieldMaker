@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-gray-950 p-4">
         <div className="max-w-4xl mx-auto">
           <ConnectWallet />
         </div>
@@ -102,42 +102,40 @@ export default function SettingsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <div className="w-14 h-14 bg-gray-800 rounded-full mx-auto animate-pulse mb-3 border border-gray-700"></div>
+          <p className="text-gray-400">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-950 p-4 pt-20">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-gray-600">
-            Manage your profile, preferences, and app settings
-          </p>
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-white mb-1">Settings</h1>
+          <p className="text-gray-400">Manage your profile, preferences, and app settings</p>
         </div>
 
         {/* Profile Section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
           <div className="flex items-center space-x-4 mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xl font-bold">
+            <div className="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
+              <span className="text-white text-lg font-semibold">
                 {user.address.slice(2, 4).toUpperCase()}
               </span>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
-              <p className="text-gray-600">{user.address}</p>
+              <h2 className="text-xl font-semibold text-white">Profile</h2>
+              <p className="text-gray-400">{user.address}</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Risk Profile
               </label>
               <div className="flex space-x-3">
@@ -148,8 +146,8 @@ export default function SettingsPage() {
                       onClick={() => handleRiskProfileChange(profile)}
                       className={`px-4 py-2 rounded-lg border transition-colors ${
                         user.riskProfile === profile
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-300 hover:border-gray-400"
+                          ? "border-emerald-600 bg-emerald-900/20 text-emerald-400"
+                          : "border-gray-700 text-gray-300 hover:border-gray-500"
                       }`}
                     >
                       {profile.charAt(0).toUpperCase() + profile.slice(1)}
@@ -162,24 +160,22 @@ export default function SettingsPage() {
         </div>
 
         {/* Notifications Section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Bell className="w-6 h-6 text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Notifications
-            </h2>
+            <Bell className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Notifications</h2>
           </div>
 
           <div className="space-y-4">
             {Object.entries(settings.notifications).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-gray-300">
                     {key
                       .replace(/([A-Z])/g, " $1")
                       .replace(/^./, (str) => str.toUpperCase())}
                   </label>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     {key === "priceAlerts" &&
                       "Get notified of significant price changes"}
                     {key === "yieldUpdates" &&
@@ -195,7 +191,7 @@ export default function SettingsPage() {
                     handleSettingChange("notifications", key, !value)
                   }
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    value ? "bg-blue-600" : "bg-gray-200"
+                    value ? "bg-emerald-600" : "bg-gray-700"
                   }`}
                 >
                   <span
@@ -210,15 +206,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Display Settings */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Palette className="w-6 h-6 text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Display</h2>
+            <Palette className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Display</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Theme
               </label>
               <select
@@ -226,7 +222,7 @@ export default function SettingsPage() {
                 onChange={(e) =>
                   handleSettingChange("display", "theme", e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -235,7 +231,7 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Currency
               </label>
               <select
@@ -243,7 +239,7 @@ export default function SettingsPage() {
                 onChange={(e) =>
                   handleSettingChange("display", "currency", e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -252,7 +248,7 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Language
               </label>
               <select
@@ -260,7 +256,7 @@ export default function SettingsPage() {
                 onChange={(e) =>
                   handleSettingChange("display", "language", e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="en">English</option>
                 <option value="es">Español</option>
@@ -271,19 +267,19 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Settings */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Shield className="w-6 h-6 text-gray-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+            <Shield className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Security</h2>
           </div>
 
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-300">
                   Two-Factor Authentication
                 </label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Add an extra layer of security to your account
                 </p>
               </div>
@@ -296,9 +292,7 @@ export default function SettingsPage() {
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.security.twoFactorAuth
-                    ? "bg-blue-600"
-                    : "bg-gray-200"
+                  settings.security.twoFactorAuth ? "bg-emerald-600" : "bg-gray-700"
                 }`}
               >
                 <span
@@ -312,7 +306,7 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Session Timeout (minutes)
               </label>
               <input
@@ -327,16 +321,16 @@ export default function SettingsPage() {
                     parseInt(e.target.value)
                   )
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-300">
                   Auto Logout
                 </label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Automatically log out after session timeout
                 </p>
               </div>
@@ -349,7 +343,7 @@ export default function SettingsPage() {
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.security.autoLogout ? "bg-blue-600" : "bg-gray-200"
+                  settings.security.autoLogout ? "bg-emerald-600" : "bg-gray-700"
                 }`}
               >
                 <span
@@ -366,7 +360,7 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
             Save Changes
           </button>
         </div>
