@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.2.1",
     "@hookform/resolvers": "^5.2.1",
     "@privy-io/react-auth": "^2.24.0",
     "@radix-ui/react-avatar": "^1.1.10",

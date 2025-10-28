@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import Web3Provider from "@/components/Providers/Web3Provider";
+import FarcasterSDKProvider from "@/components/Providers/FarcasterSDKProvider";
 import { ToastContainer } from "@/components/ui/toast";
 import "./globals.css";
 
@@ -40,8 +41,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Web3Provider>
-          {children}
-          <ToastContainer />
+          <FarcasterSDKProvider>
+            {children}
+            <ToastContainer />
+          </FarcasterSDKProvider>
         </Web3Provider>
       </body>
     </html>
