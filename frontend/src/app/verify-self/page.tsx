@@ -2,8 +2,15 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
-import { SelfAppBuilder, SelfApp, SelfQRcodeWrapper } from "@selfxyz/qrcode";
+import { useAccount, useChainId } from "wagmi";
+import { SelfAppBuilder, SelfApp } from "@selfxyz/qrcode";
+import dynamic from "next/dynamic";
+
+// Dynamic import to handle React 19 compatibility
+const SelfQRcodeWrapper = dynamic(() => import("@selfxyz/qrcode").then(mod => ({ default: mod.SelfQRcodeWrapper })), { 
+  ssr: false,
+  loading: () => <div className="w-64 h-64 bg-gray-800 rounded-lg flex items-center justify-center">Loading QR Code...</div>
+});
 import { useSubmitVerification, useIsVerified } from "@/hooks/use-verification";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, CheckCircle, AlertCircle, Loader2, Home, ArrowRight } from "lucide-react";
@@ -12,6 +19,7 @@ import Link from "next/link";
 export default function VerifySelfPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
   const [verificationStep, setVerificationStep] = useState<"scan" | "processing" | "complete">("scan");
   const [error, setError] = useState<string | null>(null);
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
@@ -24,30 +32,36 @@ export default function VerifySelfPage() {
   useEffect(() => {
     if (address && isConnected) {
       try {
-        const contractAddress = process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_44787 || 
-                               process.env.NEXT_PUBLIC_SELF_VERIFICATION_CONTRACT_ADDRESS_42220 || 
+        const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 || 
+                               process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 || 
                                "0x...";
+        
+        const endpointType = chainId === 44787 ? "staging_celo" : "celo";
+
+        console.log("🔧 Self App Configuration:", {
+          contractAddress,
+          address,
+          isConnected,
+          chainId,
+          endpointType,
+        });
         
         const app = new SelfAppBuilder({
           appName: "YieldMaker DeFi",
           scope: "YieldMaker",
           endpoint: contractAddress.toLowerCase(),
-          endpointType: "celo",
-          userId: address,
+          endpointType,
+          userId: address.toLowerCase(),
           userIdType: "hex",
           version: 2,
           userDefinedData: "yieldmaker_verification",
-          disclosures: {
-            minimumAge: 18,
-            ofac: true,
-            excludedCountries: [],
-          },
-          devMode: false,
+          devMode: true, // Changed to true for testing
         } as Partial<SelfApp>).build();
 
+        console.log("✅ Self App created successfully:", app);
         setSelfApp(app);
       } catch (error) {
-        console.error("Failed to initialize Self app:", error);
+        console.error("❌ Failed to initialize Self app:", error);
         setError("Failed to initialize verification");
       }
     }

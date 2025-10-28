@@ -36,18 +36,15 @@ const Header = () => {
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo Section - Mobile Optimized */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+              <div className="w-16 h-16 sm:w-8 sm:h-8 rounded-lg  flex items-center justify-center">
                 <Image
-                  src="/Logo.png"
+                  src="/Logo2.png"
                   alt="Logo"
                   width={20}
                   height={20}
-                  className="bg-transparent"
+                  className="bg-transparent w-full h-full object-contain"
                 />
               </div>
-              <span className="text-base sm:text-lg font-bold text-white">
-                YieldMaker
-              </span>
             </div>
 
             {/* Desktop Navigation */}
@@ -75,7 +72,7 @@ const Header = () => {
             {/* CTA Button - Mobile First */}
             <div className="flex items-center gap-2">
               {/* Main CTA Button */}
-              <div className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 rounded-lg transition-all active:scale-95">
+              <div className="bg-white hover:bg-gray-300 text-black px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 rounded-lg transition-all active:scale-95">
                 {isConnected ? (
                   <button
                     onClick={logout}
@@ -88,19 +85,7 @@ const Header = () => {
                   </button>
                 ) : (
                   <button onClick={login} className="flex items-center gap-1.5">
-                    <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
+                   
                     <span className="font-medium text-xs sm:text-sm">
                       <span className="hidden sm:inline">Start </span>Earning
                     </span>

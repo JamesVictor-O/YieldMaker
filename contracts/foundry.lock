@@ -1,0 +1,11 @@
+{
+  "lib/aave-v3-core": {
+    "rev": "b74526a7bc67a3a117a1963fc871b3eb8cea8435"
+  },
+  "lib/forge-std": {
+    "rev": "8bbcf6e3f8f62f419e5429a0bd89331c85c37824"
+  },
+  "lib/openzeppelin-contracts": {
+    "rev": "c64a1edb67b6e3f4a15cca8909c9482ad33a02b0"
+  }
+}

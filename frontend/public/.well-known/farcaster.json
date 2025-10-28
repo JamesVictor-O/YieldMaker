@@ -1,0 +1,21 @@
+{
+    "frame": {
+      "name": "YieldMaker",
+      "version": "1",
+      "iconUrl": "https://yieldmaker.netlify.app/Logo2.png",
+      "homeUrl": "https://yieldmaker.netlify.app",
+      "imageUrl": "https://yieldmaker.netlify.app/Logo2.png",
+      "splashImageUrl": "https://yieldmaker.netlify.app/Logo2.png",
+      "splashBackgroundColor": "#0EA5E9",
+      "webhookUrl": "https://yieldmaker.netlify.app/api/webhook",
+      "subtitle": "Deposit Once Earn Everywhere",
+      "description": "YieldMaker bridges the gap,Turning passive crypto holders into active DeFi earners ",
+      "primaryCategory": "finance",
+      "heroImageUrl": "https://yieldmaker.netlify.app/Logo2.png"
+    },
+    "accountAssociation": {
+      "header": "eyJmaWQiOjEwNTkzNDUsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg2MDY0NkMyRWM3NjIzRDM2NTU3NTg1MDU4M2Y3QTc0QkI0NGM2OWRiIn0",
+      "payload": "eyJkb21haW4iOiJ5aWVsZG1ha2VyLm5ldGxpZnkuYXBwIn0",
+      "signature": "Ow0F/6gvpKupDzxXt0E+5QZES1F7OftwGQAo9r/V7os4EPPD1MDnpRb67kZwPLAOvXUE6Vo4uo4Un6jLYwCCFRs="
+    }
+  }

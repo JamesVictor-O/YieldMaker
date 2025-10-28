@@ -69,9 +69,9 @@ export default function AppNavigation() {
           {/* Mobile sidebar header - Compact */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+              <div className="w-9 h-9 rounded-xl  flex items-center justify-center shadow-lg">
                 <Image
-                  src="/Logo.png"
+                  src="/Logo2.png"
                   alt="Logo"
                   width={20}
                   height={20}
