@@ -49,7 +49,7 @@ HASHED_SCOPE=12345678...
 
 ## Deployment Workflow
 
-### For Testnet (Celo Alfajores)
+### For Testnet (Celo Sepolia)
 
 1. **Calculate Scope:**
    ```bash
@@ -63,7 +63,7 @@ HASHED_SCOPE=12345678...
    ```bash
    cd contracts
    forge script script/DeploySelfVerificationRegistryFixed.s.sol \
-     --rpc-url $CELO_ALFAJORES_RPC \
+     --rpc-url $CELO_SEPOLIA_RPC \
      --broadcast \
      --verify \
      -vvvv
@@ -98,14 +98,14 @@ Required in your `.env` file:
 PRIVATE_KEY=your_private_key_here
 
 # Network RPC URLs
-CELO_ALFAJORES_RPC=https://alfajores-forno.celo-testnet.org
+CELO_SEPOLIA_RPC=https://forno.celo-sepolia.celo-testnet.org
 CELO_MAINNET_RPC=https://forno.celo.org
 
 # Self Protocol Configuration (from calculateScope.ts)
 HASHED_SCOPE=calculated_value_here
 
 # Self Protocol Hub Addresses (automatically set in deployment scripts)
-# Testnet: 0x68c931C9a534D37aa78094877F46fE46a49F1A51
+# Sepolia Testnet: 0x68c931C9a534D37aa78094877F46fE46a49F1A51
 # Mainnet: 0xe57F4773bd9c9d8b6Cd70431117d353298B9f5BF
 
 # Verification Config ID (same for both networks)

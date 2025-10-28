@@ -22,7 +22,7 @@ const APP_NAME = "YieldMaker";
 async function main() {
   // Get environment variables
   const privateKey = process.env.PRIVATE_KEY;
-  const rpcUrl = process.env.CELO_ALFAJORES_RPC || "https://alfajores-forno.celo-testnet.org";
+  const rpcUrl = process.env.CELO_TESTNET_RPC_URL || "https://forno.celo-sepolia.celo-testnet.org"
 
   if (!privateKey) {
     throw new Error("PRIVATE_KEY not found in environment variables");
