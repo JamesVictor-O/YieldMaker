@@ -21,7 +21,7 @@ contract DeploySelfVerificationRegistry is Script {
 
     // Self Protocol Hub Addresses
     address constant MAINNET_HUB = 0xe57F4773bd9c9d8b6Cd70431117d353298B9f5BF;
-    address constant TESTNET_HUB = 0x68c931C9a534D37aa78094877F46fE46a49F1A51;
+    address constant TESTNET_HUB = 0x16ECBA51e18a4a7e61fdC417f0d47AFEeDfbed74;
 
     // Verification Config ID (same for both networks)
     bytes32 constant VERIFICATION_CONFIG_ID = 0x7b6436b0c98f62380866d9432c2af0ee08ce16a171bda6951aecd95ee1307d61;
