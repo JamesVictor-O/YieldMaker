@@ -29,18 +29,18 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({}) => {
     <div className="h-full flex flex-col space-y-4">
       {/* Header Stats - Mobile Optimized */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 rounded-xl p-3 border border-emerald-500/20">
+        <div className="bg-gray-800 rounded-xl p-3 border border-emerald-700/30">
           <p className="text-emerald-400 text-xs font-medium mb-1">
             Current Month
           </p>
-          <p className="text-white font-bold text-lg">
+          <p className="text-white font-semibold text-lg">
             ${statistics.currentMonthData?.invested.toLocaleString() || 0}
           </p>
           <p className="text-gray-400 text-xs">Invested</p>
         </div>
-        <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 rounded-xl p-3 border border-blue-500/20">
+        <div className="bg-gray-800 rounded-xl p-3 border border-blue-700/30">
           <p className="text-blue-400 text-xs font-medium mb-1">Projected</p>
-          <p className="text-white font-bold text-lg">
+          <p className="text-white font-semibold text-lg">
             ${statistics.projectedEarnings.toFixed(2)}
           </p>
           <p className="text-gray-400 text-xs">This month</p>
@@ -61,7 +61,7 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({}) => {
             {filteredData.map((item, index) => (
               <div
                 key={index}
-                className="bg-gray-800/30 rounded-xl p-3 hover:bg-gray-800/50 transition-colors"
+                className="bg-gray-800 rounded-xl p-3 border border-gray-700 hover:bg-gray-800/90 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -102,9 +102,9 @@ const InvestmentChat: React.FC<InvestmentChatProps> = ({}) => {
 
                 {/* Progress Bar */}
                 <div className="mt-2">
-                  <div className="w-full bg-gray-700 rounded-full h-1">
+                  <div className="w-full bg-gray-800 rounded-full h-1">
                     <div
-                      className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-1 rounded-full transition-all duration-500"
+                      className="bg-emerald-500 h-1 rounded-full transition-all duration-500"
                       style={{
                         width: `${Math.min(
                           (item.earned / item.invested) * 100,

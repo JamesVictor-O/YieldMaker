@@ -76,7 +76,7 @@ export default function PortfolioPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-gray-950 p-4">
         <div className="max-w-6xl mx-auto">
           <ConnectWallet />
         </div>
@@ -86,10 +86,10 @@ export default function PortfolioPage() {
 
   if (!user || balanceLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse mb-4"></div>
-          <p className="text-gray-600">Loading your portfolio...</p>
+          <div className="w-14 h-14 bg-gray-800 rounded-full mx-auto animate-pulse mb-3 border border-gray-700"></div>
+          <p className="text-gray-400">Loading your portfolio...</p>
         </div>
       </div>
     );
@@ -121,35 +121,31 @@ export default function PortfolioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pt-20">
+    <div className="min-h-screen bg-gray-950 p-4 pt-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolio</h1>
-          <p className="text-gray-600">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-white mb-1">Portfolio</h1>
+          <p className="text-gray-400">
             Track your investments and performance across DeFi protocols
           </p>
         </div>
 
         {/* Portfolio Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 Total Portfolio Value
               </h3>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-2">
+            <p className="text-3xl font-bold text-white mb-2">
               ${formatNumber(totalValue)}
             </p>
             <div className="flex items-center space-x-2">
               <Badge
-                className={`${
-                  realEarnings >= 0
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
+                className={`${realEarnings >= 0 ? "bg-emerald-900/30 text-emerald-400 border border-emerald-800/50" : "bg-red-900/30 text-red-400 border border-red-800/50"}`}
               >
                 {realEarnings >= 0 ? "+" : ""}
                 {userInitialDeposit > 0
@@ -157,35 +153,35 @@ export default function PortfolioPage() {
                   : "0"}
                 %
               </Badge>
-              <span className="text-sm text-gray-600">Total Return</span>
+              <span className="text-sm text-gray-400">Total Return</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 Total Invested
               </h3>
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-2">
+            <p className="text-3xl font-bold text-white mb-2">
               ${formatNumber(userInitialDeposit)}
             </p>
-            <p className="text-sm text-gray-600">Principal Amount</p>
+            <p className="text-sm text-gray-400">Principal Amount</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 Total Earnings
               </h3>
-              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+              <div className="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-2">
+            <p className="text-3xl font-bold text-white mb-2">
               ${formatNumber(realEarnings)}
             </p>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-purple-100 text-purple-800">
+              <Badge className="bg-purple-900/30 text-purple-300 border border-purple-800/50">
                 {availableStrategies[0]?.apy || "8.2"}% APY
               </Badge>
             </div>
@@ -193,64 +189,61 @@ export default function PortfolioPage() {
         </div>
 
         {/* Active Positions */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
+        <div className="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-6">
+          <h3 className="text-xl font-semibold text-white mb-4">
             Active Positions
           </h3>
 
           {investments.length > 0 ? (
             <div className="space-y-4">
               {investments.map((investment, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors"
-                >
+                <div key={index} className="border border-gray-800 rounded-lg p-5 hover:bg-gray-800 transition-colors">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">YM</span>
+                      <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
+                        <span className="text-white font-semibold text-xs">YM</span>
                       </div>
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900">
+                        <h4 className="text-base font-semibold text-white">
                           {investment.name}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-400">
                           {investment.description}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-xl font-bold text-white">
                         ${formatNumber(investment.amount + investment.earnings)}
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Badge className="bg-green-100 text-green-800">
+                        <Badge className="bg-emerald-900/30 text-emerald-400 border border-emerald-800/50">
                           {investment.apy}%
                         </Badge>
                         <div className="flex items-center space-x-1">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-xs text-gray-500">Active</span>
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                          <span className="text-xs text-gray-400">Active</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-800">
                     <div>
-                      <p className="text-sm text-gray-600">Invested</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-sm text-gray-400">Invested</p>
+                      <p className="text-lg font-semibold text-white">
                         ${formatNumber(investment.amount)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Earnings</p>
-                      <p className="text-lg font-semibold text-green-600">
+                      <p className="text-sm text-gray-400">Earnings</p>
+                      <p className="text-lg font-semibold text-emerald-400">
                         +${formatNumber(investment.earnings)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Share of Vault</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-sm text-gray-400">Share of Vault</p>
+                      <p className="text-lg font-semibold text-white">
                         {totalAssetsFormatted > 0
                           ? `${(
                               (vaultBalanceFormatted / totalAssetsFormatted) *
@@ -264,17 +257,17 @@ export default function PortfolioPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="text-center py-10">
+              <div className="w-14 h-14 bg-gray-800 rounded-full mx-auto mb-3 flex items-center justify-center border border-gray-700">
                 <span className="text-2xl">📊</span>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
+              <h4 className="text-lg font-semibold text-white mb-1">
                 No Active Positions
               </h4>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-400 mb-5">
                 Start investing to see your positions here
               </p>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Start Investing
               </Button>
             </div>
@@ -282,15 +275,15 @@ export default function PortfolioPage() {
         </div>
 
         {/* Performance Chart Placeholder */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
+        <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
+          <h3 className="text-xl font-semibold text-white mb-4">
             Performance Over Time
           </h3>
-          <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+          <div className="h-64 bg-gray-800 rounded-lg flex items-center justify-center">
             <div className="text-center">
               <div className="text-4xl mb-2">📈</div>
-              <p className="text-gray-600">Performance chart coming soon</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-gray-300">Performance chart coming soon</p>
+              <p className="text-sm text-gray-400">
                 Track your portfolio growth over time
               </p>
             </div>

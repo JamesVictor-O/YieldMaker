@@ -32,7 +32,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     useVaultBalance();
   const { totalAssets, strategy: currentStrategy } = useVaultInfo();
   const { address } = useAccount();
-  const { data: isVerified = false, isLoading: isVerifiedLoading } = useIsVerified(address as `0x${string}`);
+  const { data: isVerified = false,  } = useIsVerified(address as `0x${string}`);
   const registryAddress = useContractAddress();
 
   const availableStrategies = useAvailableStrategies();
@@ -129,7 +129,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   return (
     <div className="min-h-screen text-white">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
+      <div className="max-w-7xl mx-auto px-3 pt-16 sm:px-4 lg:px-6 py-4">
         {/* Top Stats Cards - Clean Design */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {/* Total Portfolio */}

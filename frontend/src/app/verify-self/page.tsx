@@ -65,7 +65,7 @@ export default function VerifySelfPage() {
         setError("Failed to initialize verification");
       }
     }
-  }, [address, isConnected]);
+  }, [address, isConnected, chainId]);
 
 
   // Handle successful verification
@@ -151,21 +151,21 @@ export default function VerifySelfPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-white">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-950">
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full text-white">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center">
+          <div className="w-14 h-14 mx-auto mb-3 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
             {verificationStep === "complete" ? (
-              <CheckCircle className="w-8 h-8 text-white" />
+              <CheckCircle className="w-7 h-7 text-white" />
             ) : verificationStep === "processing" ? (
-              <Loader2 className="w-8 h-8 text-white animate-spin" />
+              <Loader2 className="w-7 h-7 text-white animate-spin" />
             ) : (
-              <Shield className="w-8 h-8 text-white" />
+              <Shield className="w-7 h-7 text-white" />
             )}
           </div>
           
-          <h1 className="text-2xl font-semibold mb-2">
+          <h1 className="text-xl font-semibold mb-1">
             {verificationStep === "complete"
               ? "Verification Complete!"
               : verificationStep === "processing"
@@ -173,7 +173,7 @@ export default function VerifySelfPage() {
               : "Verify with Self"}
           </h1>
           
-          <p className="text-sm text-gray-300">
+          <p className="text-xs text-gray-300">
             {verificationStep === "complete"
               ? "Your identity has been verified successfully"
               : verificationStep === "processing"
@@ -193,16 +193,16 @@ export default function VerifySelfPage() {
         {/* Content */}
         <div className="flex justify-center">
           {verificationStep === "processing" ? (
-            <div className="text-center py-8">
-              <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
-              <p className="text-sm text-gray-400">Verifying your identity...</p>
+            <div className="text-center py-6">
+              <Loader2 className="w-10 h-10 text-emerald-500 mx-auto mb-3 animate-spin" />
+              <p className="text-xs text-gray-400">Verifying your identity...</p>
             </div>
           ) : verificationStep === "complete" ? (
-            <div className="text-center py-8">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <p className="text-sm text-gray-400 mb-4">Verification Complete!</p>
+            <div className="text-center py-6">
+              <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-3" />
+              <p className="text-xs text-gray-400 mb-3">Verification Complete!</p>
               <Link href="/dashboard">
-                <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 mx-auto">
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg flex items-center gap-2 mx-auto">
                   Go to Dashboard
                   <ArrowRight className="w-4 h-4" />
                 </button>
@@ -210,22 +210,22 @@ export default function VerifySelfPage() {
             </div>
           ) : selfApp ? (
             <div className="text-center">
-              <div className="inline-block p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+              <div className="inline-block p-3 bg-gray-800 rounded-xl border border-gray-700">
                 <SelfQRcodeWrapper
                   selfApp={selfApp}
                   onSuccess={handleSuccess}
                   onError={handleError}
-                  size={280}
+                  size={240}
                 />
               </div>
-              <div className="mt-4 text-xs text-gray-400">
+              <div className="mt-3 text-[11px] text-gray-400">
                 <p>Connected as: {address.slice(0, 6)}...{address.slice(-4)}</p>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-              <p className="text-sm text-gray-400">
+            <div className="text-center py-6">
+              <AlertCircle className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
+              <p className="text-xs text-gray-400">
                 Initializing verification system...
               </p>
             </div>
@@ -234,9 +234,9 @@ export default function VerifySelfPage() {
 
         {/* Info Section */}
         {verificationStep === "scan" && (
-          <div className="mt-6 pt-6 border-t border-gray-800">
-            <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll need:</h3>
-            <ul className="space-y-2 text-xs text-gray-300">
+          <div className="mt-5 pt-5 border-t border-gray-800">
+            <h3 className="text-sm font-semibold text-white mb-2">What you&apos;ll need:</h3>
+            <ul className="space-y-1.5 text-[11px] text-gray-300">
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 mt-0.5">•</span>
                 <span>Self mobile app installed</span>
