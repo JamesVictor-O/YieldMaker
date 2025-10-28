@@ -1,0 +1,16 @@
+{
+  "name": "yieldmaker",
+  "version": "1.0.0",
+  "description": "YieldMaker - DeFi Yield Aggregator with Self Protocol Verification",
+  "scripts": {
+    "calculate-scope": "ts-node scripts/calculateScope.ts"
+  },
+  "devDependencies": {
+    "@selfxyz/core": "^0.0.25",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "ethers": "^6.0.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
+}
