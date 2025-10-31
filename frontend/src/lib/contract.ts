@@ -38,7 +38,7 @@ export const CONTRACT_CONFIG = {
   addresses: {
     44787: (process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 || undefined) as
       | `0x${string}`
-      | undefined, // Celo Alfajores
+      | undefined, // Celo Alfajores Testnet
     42220: (process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 || undefined) as
       | `0x${string}`
       | undefined, // Celo Mainnet
