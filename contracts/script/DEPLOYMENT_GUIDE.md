@@ -28,7 +28,7 @@ Complete guide for deploying the SelfVerificationRegistry contract to Celo netwo
    ```
 
 3. **Fund Your Deployer:**
-   - **Testnet:** Get free CELO from [Celo Sepolia Faucet](https://faucet.celo.org)
+   - **Testnet:** Get free CELO from [Celo Alfajores Faucet](https://faucet.celo.org)
    - **Mainnet:** Ensure you have at least 1 CELO
 
 ---
@@ -72,7 +72,7 @@ We provide three deployment scripts:
 
 | Script | Use Case | Network |
 |--------|----------|---------|
-| `DeploySelfVerificationRegistryFixed.s.sol` | Testnet-only, hardcoded values | Sepolia (11142220) |
+| `DeploySelfVerificationRegistryFixed.s.sol` | Testnet-only, hardcoded values | Alfajores (44787) |
 | `DeploySelfVerificationRegistry.s.sol` | Auto-detects network | Any Celo network |
 | `DeploySelfVerificationRegistryMainnet.s.sol` | Mainnet-only, strict checks | Mainnet (42220) |
 
@@ -102,7 +102,7 @@ forge script script/DeploySelfVerificationRegistry.s.sol \
 **Expected Output:**
 ```
 === DEPLOYING TO CELO SEPOLIA TESTNET ===
-Chain ID: 11142220
+Chain ID: 44787
 Deployer: 0x1234...
 Balance: 10.5 CELO
 Self Hub: 0x68c931C9a534D37aa78094877F46fE46a49F1A51
@@ -116,7 +116,7 @@ Owner: 0x1234...
 Contract size: 4567 bytes
 
 Verify on explorer:
-https://celo-sepolia.celoscan.io/address/0xABCD...
+https://celo-alfajores.celoscan.io/address/0xABCD...
 
 === NEXT STEPS ===
 1. Verify contract on block explorer (if --verify flag was used)
@@ -251,15 +251,15 @@ cast call <REGISTRY_ADDRESS> \
 
 ## 📊 Network Configuration Reference
 
-### Celo Sepolia Testnet
+### Celo Alfajores Testnet
 
 | Parameter | Value |
 |-----------|-------|
-| Chain ID | 11142220 |
-| RPC URL | https://forno.celo-sepolia.celo-testnet.org |
+| Chain ID | 44787 |
+| RPC URL | https://forno.celo-alfajores.celo-testnet.org |
 | Self Hub Address | `0x68c931C9a534D37aa78094877F46fE46a49F1A51` |
 | Verification Config ID | `0x7b6436b0c98f62380866d9432c2af0ee08ce16a171bda6951aecd95ee1307d61` |
-| Block Explorer | https://celo-sepolia.celoscan.io |
+| Block Explorer | https://celo-alfajores.celoscan.io |
 | Faucet | https://faucet.celo.org |
 | Min Balance | 0.1 CELO |
 
@@ -298,7 +298,7 @@ cast call <REGISTRY_ADDRESS> \
 
 ---
 
-### Issue: "Must deploy to Celo Sepolia (11142220)"
+### Issue: "Must deploy to Celo Alfajores (44787)"
 
 **Cause:** Using testnet script on wrong network.
 
@@ -317,7 +317,7 @@ cast call <REGISTRY_ADDRESS> \
 ```bash
 # Verify manually with exact settings
 forge verify-contract \
-  --chain-id 11142220 \
+  --chain-id 44787 \
   --compiler-version v0.8.20 \
   --num-of-optimizations 200 \
   --watch \

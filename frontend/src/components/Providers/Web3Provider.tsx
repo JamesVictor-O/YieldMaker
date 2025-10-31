@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { celoAlfajores } from "wagmi/chains";
+import { defineChain } from "viem";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -14,6 +14,29 @@ interface Web3ProviderProps {
 
 // Create a query client
 const queryClient = new QueryClient();
+
+// Define Celo Alfajores Testnet
+const celoAlfajores = defineChain({
+  id: 44787,
+  name: 'Celo Alfajores Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'CELO',
+    symbol: 'CELO',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://alfajores-forno.celo-testnet.org']
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'CeloScan',
+      url: 'https://alfajores.celoscan.io'
+    },
+  },
+  testnet: true,
+});
 
 // Wagmi config for Celo Alfajores testnet
 const config = getDefaultConfig({

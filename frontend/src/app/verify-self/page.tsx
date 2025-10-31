@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useChainId } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 import { SelfAppBuilder, SelfApp } from "@selfxyz/qrcode";
 import dynamic from "next/dynamic";
 
@@ -18,54 +19,83 @@ import Link from "next/link";
 
 export default function VerifySelfPage() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
+  const { ready, authenticated, user } = usePrivy();
   const chainId = useChainId();
   const [verificationStep, setVerificationStep] = useState<"scan" | "processing" | "complete">("scan");
   const [error, setError] = useState<string | null>(null);
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
   const { submitVerification, isConfirmed: isVerificationConfirmed } = useSubmitVerification();
   const { data: isVerified = false, refetch: refetchVerification } = useIsVerified(address);
   const { success, error: showError } = useToast();
 
+  // Get wallet address from Privy or wagmi
+  const walletAddress = address ||
+    (user?.wallet as { address?: string })?.address ||
+    (user?.linkedAccounts as Array<{ type?: string; address?: string }>)?.find(
+      (account) => account?.type === "wallet"
+    )?.address;
+
+  const isConnected = ready && authenticated;
+
 
   // Initialize Self App configuration
   useEffect(() => {
-    if (address && isConnected) {
+    if (walletAddress && isConnected) {
       try {
-        const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 || 
-                               process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 || 
+        const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 ||
+                               process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 ||
                                "0x...";
-        
+
+        // For Celo Alfajores testnet, use "staging_celo" endpoint type
         const endpointType = chainId === 44787 ? "staging_celo" : "celo";
+
+        console.log("🌐 Network detection:", {
+          currentChainId: chainId,
+          expectedChainId: 44787,
+          selectedEndpointType: endpointType,
+          isAlfajoresTestnet: chainId === 44787,
+        });
 
         console.log("🔧 Self App Configuration:", {
           contractAddress,
-          address,
+          walletAddress,
           isConnected,
           chainId,
           endpointType,
+          appName: "YieldMaker DeFi",
+          scope: "YieldMaker",
+          version: 2,
+          devMode: true,
         });
-        
-        const app = new SelfAppBuilder({
+
+        const selfAppConfig = {
           appName: "YieldMaker DeFi",
           scope: "YieldMaker",
           endpoint: contractAddress.toLowerCase(),
           endpointType,
-          userId: address.toLowerCase(),
+          userId: walletAddress.toLowerCase(),
           userIdType: "hex",
           version: 2,
+          chainID: 44787, // Celo Alfajores testnet (Self SDK supported)
           userDefinedData: "yieldmaker_verification",
-          devMode: true, // Changed to true for testing
-        } as Partial<SelfApp>).build();
+          devMode: true, // Enable dev mode for testnet
+        };
 
-        console.log("✅ Self App created successfully:", app);
+        console.log("🔧 Building Self App with config:", selfAppConfig);
+
+        const app = new SelfAppBuilder(selfAppConfig as Partial<SelfApp>).build();
+
+        console.log("✅ Self App created successfully");
+        console.log("   App details:", JSON.stringify(app, null, 2));
         setSelfApp(app);
       } catch (error) {
         console.error("❌ Failed to initialize Self app:", error);
         setError("Failed to initialize verification");
       }
     }
-  }, [address, isConnected]);
+  }, [walletAddress, isConnected, chainId]);
 
 
   // Handle successful verification
@@ -75,10 +105,10 @@ export default function VerifySelfPage() {
       setError(null);
 
       try {
-        if (proofData && address) {
+        if (proofData && walletAddress) {
           // Submit verification proof to smart contract
           const proofPayload = JSON.stringify(proofData);
-          const userContextData = JSON.stringify({ userAddress: address, timestamp: Date.now() });
+          const userContextData = JSON.stringify({ userAddress: walletAddress, timestamp: Date.now() });
 
           submitVerification({
             proofPayload: `0x${Buffer.from(proofPayload).toString('hex')}`,
@@ -99,13 +129,51 @@ export default function VerifySelfPage() {
         setVerificationStep("scan");
       }
     },
-    [address, submitVerification, success, showError]
+    [walletAddress, submitVerification, success, showError]
   );
 
   // Handle verification errors
   const handleError = useCallback((error: unknown) => {
-    console.error("Verification error:", error);
-    showError("Verification failed", "Please try again or contact support if the issue persists.");
+    console.error("❌ Verification error (full):", error);
+    console.error("❌ Error type:", typeof error);
+    console.error("❌ Error keys:", error ? Object.keys(error) : "null");
+
+    let errorMessage = "Please try again or contact support if the issue persists.";
+    let errorTitle = "Verification failed";
+
+    // Check for common error scenarios
+    if (error instanceof Error) {
+      console.error("❌ Error message:", error.message);
+      console.error("❌ Error stack:", error.stack);
+
+      if (error.message.includes("verification") || error.message.includes("KYC")) {
+        errorTitle = "Identity Verification Failed";
+        errorMessage = "Please ensure you've completed KYC in the Self mobile app and meet all requirements (18+, valid ID).";
+      } else if (error.message.includes("proof") || error.message.includes("invalid")) {
+        errorTitle = "Proof Validation Failed";
+        errorMessage = "The verification proof is invalid. Please ensure you're using the latest Self app version.";
+      } else if (error.message.includes("config") || error.message.includes("scope")) {
+        errorTitle = "Configuration Error";
+        errorMessage = "Verification configuration mismatch. Please contact support.";
+      } else if (error.message.includes("rejected") || error.message.includes("denied")) {
+        errorTitle = "Verification Cancelled";
+        errorMessage = "You cancelled the verification process. Please try again when ready.";
+      } else {
+        errorMessage = error.message;
+      }
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error && typeof error === 'object') {
+      // Try to extract error from object
+      const errObj = error as any;
+      if (errObj.message) errorMessage = errObj.message;
+      if (errObj.reason) errorMessage = errObj.reason;
+      if (errObj.code) errorMessage += ` (Code: ${errObj.code})`;
+    }
+
+    console.error("❌ Final error message:", errorMessage);
+    showError(errorTitle, errorMessage);
+    setError(errorMessage);
     setVerificationStep("scan");
   }, [showError]);
 
@@ -125,14 +193,39 @@ export default function VerifySelfPage() {
     }
   }, [isVerified, verificationStep]);
 
-  // Redirect if not connected
+  // Check wallet connection with delay to allow Privy to initialize
   useEffect(() => {
-    if (!isConnected) {
+    const timer = setTimeout(() => {
+      console.log("🔍 Connection check:", { isConnected, walletAddress, ready, authenticated });
+      setIsCheckingConnection(false);
+    }, 1000); // Give Privy 1 second to initialize connection
+
+    return () => clearTimeout(timer);
+  }, [isConnected, walletAddress, ready, authenticated]);
+
+  // Redirect if not connected after initial check
+  useEffect(() => {
+    if (!isCheckingConnection && !isConnected) {
+      console.log("⚠️ No wallet connected, redirecting to home");
       router.push("/");
     }
-  }, [isConnected, router]);
+  }, [isCheckingConnection, isConnected, router]);
 
-  if (!isConnected || !address) {
+  // Show loading while checking connection
+  if (isCheckingConnection) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
+          <Loader2 className="w-12 h-12 text-emerald-500 mx-auto mb-4 animate-spin" />
+          <h1 className="text-xl font-semibold text-white mb-2">Loading...</h1>
+          <p className="text-sm text-gray-300">Checking wallet connection...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show "not connected" if we've finished checking and there's no wallet
+  if (!isCheckingConnection && !isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
@@ -218,9 +311,11 @@ export default function VerifySelfPage() {
                   size={280}
                 />
               </div>
-              <div className="mt-4 text-xs text-gray-400">
-                <p>Connected as: {address.slice(0, 6)}...{address.slice(-4)}</p>
-              </div>
+              {walletAddress && (
+                <div className="mt-4 text-xs text-gray-400">
+                  <p>Connected as: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-8">
@@ -235,21 +330,30 @@ export default function VerifySelfPage() {
         {/* Info Section */}
         {verificationStep === "scan" && (
           <div className="mt-6 pt-6 border-t border-gray-800">
-            <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll need:</h3>
-            <ul className="space-y-2 text-xs text-gray-300">
+            <h3 className="text-sm font-semibold text-white mb-3">Before you scan:</h3>
+            <ul className="space-y-2 text-xs text-gray-300 mb-4">
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-0.5">•</span>
-                <span>Self mobile app installed</span>
+                <span className="text-blue-400 mt-0.5">1.</span>
+                <span>Download Self mobile app from App Store or Google Play</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-0.5">•</span>
-                <span>Valid government-issued ID</span>
+                <span className="text-blue-400 mt-0.5">2.</span>
+                <span><strong className="text-emerald-400">Complete KYC verification</strong> in the Self app first (government ID + face scan)</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-0.5">•</span>
-                <span>Must be 18+ years old</span>
+                <span className="text-blue-400 mt-0.5">3.</span>
+                <span>Must be 18+ years old and meet verification requirements</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">4.</span>
+                <span>Then scan this QR code with the Self app</span>
               </li>
             </ul>
+            <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-3">
+              <p className="text-xs text-amber-200">
+                <strong>Note:</strong> This is real identity verification, not a test. You must complete actual KYC in the Self app before scanning.
+              </p>
+            </div>
           </div>
         )}
       </div>

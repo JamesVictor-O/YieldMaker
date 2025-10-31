@@ -7,13 +7,13 @@ import {SelfVerificationRegistry} from "../src/SelfVerificationRegistry.sol";
 
 /**
  * @title DeploySelfVerificationRegistryFixed
- * @notice Deploy SelfVerificationRegistry to Celo Sepolia Testnet with safety checks
- * @dev Usage: forge script script/DeploySelfVerificationRegistryFixed.s.sol --rpc-url $CELO_SEPOLIA_RPC --broadcast --verify -vvvv
+ * @notice Deploy SelfVerificationRegistry to Celo Alfajores Testnet with safety checks
+ * @dev Usage: forge script script/DeploySelfVerificationRegistryFixed.s.sol --rpc-url $CELO_ALFAJORES_RPC --broadcast --verify -vvvv
  */
 contract DeploySelfVerificationRegistryFixed is Script {
-    // Celo Sepolia Testnet Constants
-    uint256 constant CELO_SEPOLIA_CHAIN_ID = 11142220;
-    address constant SELF_HUB_ADDRESS = 0x16ECBA51e18a4a7e61fdC417f0d47AFEeDfbed74;
+    // Celo Alfajores Testnet Constants
+    uint256 constant CELO_ALFAJORES_CHAIN_ID = 44787;
+    address constant SELF_HUB_ADDRESS = 0x68c931C9a534D37aa78094877F46fE46a49F1A51; // Self Hub on Alfajores
     bytes32 constant VERIFICATION_CONFIG_ID = 0x7b6436b0c98f62380866d9432c2af0ee08ce16a171bda6951aecd95ee1307d61;
 
     // Minimum balance required for deployment (testnet)
@@ -30,10 +30,10 @@ contract DeploySelfVerificationRegistryFixed is Script {
         uint256 scope = vm.envUint("HASHED_SCOPE");
 
         // Safety checks
-        require(block.chainid == CELO_SEPOLIA_CHAIN_ID, "Must deploy to Celo Sepolia (11142220)");
+        require(block.chainid == CELO_ALFAJORES_CHAIN_ID, "Must deploy to Celo Alfajores (44787)");
         require(deployer.balance >= MIN_DEPLOYER_BALANCE, "Deployer balance too low (need >= 0.1 CELO)");
 
-        console2.log("\n=== DEPLOYING TO CELO SEPOLIA TESTNET ===");
+        console2.log("\n=== DEPLOYING TO CELO ALFAJORES TESTNET ===");
         console2.log("Chain ID:", block.chainid);
         console2.log("Deployer:", deployer);
         console2.log("Balance:", deployer.balance / 1e18, "CELO");
@@ -60,7 +60,7 @@ contract DeploySelfVerificationRegistryFixed is Script {
         console2.log("Verification Config ID:");
         console2.logBytes32(registry.verificationConfigId());
         console2.log("\nVerify on explorer:");
-        console2.log("https://celo-sepolia.celoscan.io/address/", vm.toString(address(registry)));
+        console2.log("https://alfajores.celoscan.io/address/", vm.toString(address(registry)));
 
         // Verify contract size
         uint256 size;
