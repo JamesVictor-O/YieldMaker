@@ -71,7 +71,7 @@ export default function AppNavigation() {
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl  flex items-center justify-center shadow-lg">
                 <Image
-                  src="/Logo2.png"
+                  src="/Logo3.png"
                   alt="Logo"
                   width={20}
                   height={20}
@@ -161,9 +161,9 @@ export default function AppNavigation() {
         <div className="flex flex-col flex-grow bg-gradient-to-b from-gray-900 via-black to-gray-900 border-r border-gray-800/50 shadow-2xl">
           {/* Desktop logo */}
           <div className="flex items-center space-x-3 p-6 border-b border-gray-800/50">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-xl  flex items-center justify-center shadow-lg">
               <Image
-                src="/Logo.png"
+                src="/Logo3.png"
                 alt="Logo"
                 width={24}
                 height={24}
@@ -251,19 +251,6 @@ export default function AppNavigation() {
               <Menu className="w-5 h-5 text-gray-300" />
             </button>
 
-            {/* Mobile Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
-                <Image
-                  src="/Logo.png"
-                  alt="Logo"
-                  width={16}
-                  height={16}
-                  className="bg-transparent"
-                />
-              </div>
-              <span className="text-sm font-bold text-white">YieldMaker</span>
-            </div>
           </div>
 
           {/* Mobile Wallet Button - Compact */}

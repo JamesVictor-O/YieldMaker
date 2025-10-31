@@ -49,21 +49,20 @@ export default function DashboardPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-gray-900 border border-gray-800">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-2xl font-bold text-white">
               Connect Your Wallet
             </CardTitle>
+            <p className="text-sm text-gray-400">Access your personalized DeFi dashboard</p>
           </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-gray-600">
-              Please connect your wallet to access the dashboard
-            </p>
-            <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-            <Button onClick={login} className="w-full">
+          <CardContent className="text-center space-y-6">
+            <div className="mx-auto w-14 h-14 rounded-full bg-gray-800 border border-gray-700" />
+            <Button onClick={login} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
               Connect Wallet
             </Button>
+            <p className="text-xs text-gray-500">Secure connection powered by Privy</p>
           </CardContent>
         </Card>
       </div>

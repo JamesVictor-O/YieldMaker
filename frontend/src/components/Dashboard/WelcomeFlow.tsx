@@ -118,8 +118,10 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
     }
   };
 
+  const [isNavigating, setIsNavigating] = useState(false);
   const handleSelfVerify = async () => {
-    // Navigate to verification page; onboarding completion will be updated
+    if (isNavigating) return;
+    setIsNavigating(true);
     router.push("/verify-self");
   };
 
@@ -152,13 +154,13 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
   const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
 
   return (
-    <div className="md:h-screen sm:px-6 lg:px-8 flex md:items-center md:justify-center mt-15 md:mt-0">
-      <div className="w-full">
+    <div className="min-h-screen flex flex-col pt-14 ">
+      <div className="flex-1 px-4 py-4 sm:px-6 lg:px-8">
         {/* Main Card */}
-        <div className=" rounded shadow-xl overflow-hidden">
+        <div className="max-w-xl mx-auto rounded-2xl border border-gray-800 bg-gray-900">
           {/* Progress Section */}
-          <div className="px-6 py-6 sm:px-8 md:border-b border-gray-700">
-            <div className="flex items-center justify-between mb-4">
+          <div className="px-4 py-4 sm:px-6 border-b border-gray-800">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-white md:text-gray-300">
                 Step {currentStep + 1} of {totalSteps}
               </span>
@@ -168,7 +170,7 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full bg-gray-700 rounded-full h-1 overflow-hidden">
+            <div className="mt-3 w-full bg-gray-800 rounded-full h-1 overflow-hidden">
               <div
                 className="bg-emerald-500 h-full rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progressPercentage}%` }}
@@ -176,14 +178,14 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
             </div>
 
             {/* Step Indicators */}
-            <div className="flex justify-between mt-2">
+            <div className="flex justify-between mt-3">
               {Array.from({ length: totalSteps }).map((_, index) => (
                 <div
                   key={index}
-                  className={`flex items-center justify-center w-6 h-6 rounded-full border-2 transition-all duration-300 ${
+                  className={`flex items-center justify-center w-6 h-6 rounded-full border transition-all duration-300 ${
                     index <= currentStep
-                      ? "bg-emerald-500 border-emerald-500 text-white"
-                      : "bg-gray-700 border-gray-600 text-gray-400"
+                      ? "bg-emerald-600 border-emerald-600 text-white"
+                      : "bg-gray-800 border-gray-700 text-gray-400"
                   }`}
                 >
                   {index < currentStep ? (
@@ -197,20 +199,20 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
           </div>
 
           {/* Content Section */}
-          <div className="px-6 md:py-8 sm:px-8">
+          <div className="px-4 py-5 sm:px-6">
             {isQuestionStep && currentQuestion ? (
               <>
-                <div className="text-center mb-4 md:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 md:mb-3">
+                <div className="text-center mb-4">
+                  <h2 className="text-lg sm:text-2xl font-semibold text-white mb-1">
                     {currentQuestion.question}
                   </h2>
-                  <p className="text-white md:text-gray-400 text-sm sm:text-base">
+                  <p className="text-gray-400 text-sm">
                     {currentQuestion.subtitle}
                   </p>
                 </div>
 
                 {/* Options */}
-                <div className="md:space-y-4 space-y-2">
+                <div className="space-y-2">
                   {currentQuestion.options.map((option) => {
                     const isSelected = selectedAnswer === option.value;
                     return (
@@ -219,25 +221,25 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                         onClick={() =>
                           handleAnswer(currentQuestion.id, option.value)
                         }
-                        className={`w-full p-4 sm:p-6 text-left border-2 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                        className={`w-full p-4 text-left border rounded-xl transition-colors ${
                           isSelected
-                            ? "border-emerald-500 bg-emerald-500/10"
-                            : "border-gray-600 bg-gray-700 hover:border-gray-500 hover:bg-gray-600"
+                            ? "border-emerald-600 bg-emerald-600/10"
+                            : "border-gray-700 bg-gray-800 hover:border-gray-600"
                         }`}
                       >
-                        <div className="flex items-start space-x-4">
+                        <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 mt-1">
                             {isSelected ? (
                               <CheckCircle className="w-5 h-5 text-emerald-400" />
                             ) : (
-                              <Circle className="w-5 h-5 text-gray-400" />
+                              <Circle className="w-5 h-5 text-gray-500" />
                             )}
                           </div>
                           <div className="flex-grow">
-                            <div className="font-semibold text-white mb-1">
+                            <div className="font-medium text-white mb-0.5">
                               {option.label}
                             </div>
-                            <div className="text-sm text-gray-300">
+                            <div className="text-sm text-gray-400">
                               {option.desc}
                             </div>
                           </div>
@@ -249,43 +251,28 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
               </>
             ) : (
               <>
-                <div className="text-center mb-4 md:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 md:mb-3">
+                <div className="text-center mb-4">
+                  <h2 className="text-lg sm:text-2xl font-semibold text-white mb-1">
                     Verify with Self (optional)
                   </h2>
-                  <p className="text-white md:text-gray-400 text-sm sm:text-base">
-                    Get access to more yield opportunities by proving you are a unique human. You can skip this and do it later.
+                  <p className="text-gray-400 text-sm">
+                    Get access to more yield opportunities by proving you are a unique human. You can always do this later.
                   </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 sm:justify-center">
-                  <button
-                    onClick={handleSelfVerify}
-                    className="px-4 py-3 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
-                  >
-                    Verify with Self
-                  </button>
-                  <button
-                    onClick={handleSkipSelf}
-                    className="px-4 py-3 rounded-xl font-semibold bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
-                  >
-                    Skip for now
-                  </button>
                 </div>
               </>
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-3 py-3 mt-2 sm:px-8 md:bg-gray-700 md:border-t border-gray-600">
-            <div className="flex flex-row justify-between items-center space-y-4 sm:space-y-0">
+          <div className="sticky bottom-0 px-4 py-3 border-t border-gray-800 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/80">
+            <div className="max-w-xl mx-auto flex flex-row justify-between items-center">
               <button
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-xl font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium ${
                   currentStep === 0
-                    ? "text-gray-500 cursor-not-allowed"
-                    : "text-gray-300 hover:text-white hover:bg-gray-600"
+                    ? "text-gray-600 cursor-not-allowed"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800"
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -296,10 +283,10 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 <button
                   onClick={handleNext}
                   disabled={!selectedAnswer}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold transition-all duration-200 transform ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
                     selectedAnswer
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 shadow-lg"
-                      : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                      : "bg-gray-700 text-gray-400 cursor-not-allowed"
                   }`}
                 >
                   <span>
@@ -313,15 +300,20 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={handleSkipSelf}
-                    className="px-3 py-2 rounded-xl font-semibold bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+                    className="px-3 py-2 rounded-lg font-semibold bg-gray-800 text-gray-200 hover:bg-gray-700"
                   >
                     Skip for now
                   </button>
                   <button
                     onClick={handleSelfVerify}
-                    className="px-3 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                    disabled={isNavigating}
+                    className={`px-3 py-2 rounded-lg font-semibold text-white ${
+                      isNavigating
+                        ? "bg-emerald-700/60 cursor-wait"
+                        : "bg-emerald-600 hover:bg-emerald-700"
+                    }`}
                   >
-                    Verify with Self
+                    {isNavigating ? "Opening..." : "Verify with Self"}
                   </button>
                 </div>
               )}

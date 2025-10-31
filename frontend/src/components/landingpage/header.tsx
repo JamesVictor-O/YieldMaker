@@ -36,9 +36,9 @@ const Header = () => {
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo Section - Mobile Optimized */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-16 h-16 sm:w-8 sm:h-8 rounded-lg  flex items-center justify-center">
+              <div className=" h-8 w-8 md:w-16 md:h-16 bg-red-300 sm:w-8 sm:h-8 rounded-lg  flex items-center justify-center">
                 <Image
-                  src="/Logo2.png"
+                  src="/Logo3.png"
                   alt="Logo"
                   width={20}
                   height={20}
