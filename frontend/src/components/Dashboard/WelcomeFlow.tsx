@@ -122,6 +122,10 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
   const handleSelfVerify = async () => {
     if (isNavigating) return;
     setIsNavigating(true);
+    // Persist the user's answers so the welcome flow is not shown again
+    try {
+      await finalizeOnboarding(false);
+    } catch {}
     router.push("/verify-self");
   };
 
