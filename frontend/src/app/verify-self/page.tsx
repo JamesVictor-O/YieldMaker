@@ -24,6 +24,7 @@ export default function VerifySelfPage() {
   const chainId = useChainId();
   const [verificationStep, setVerificationStep] = useState<"scan" | "processing" | "complete">("scan");
   const [error, setError] = useState<string | null>(null);
+  const [qrSize, setQrSize] = useState<number>(240);
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
   const { submitVerification, isConfirmed: isVerificationConfirmed } = useSubmitVerification();
@@ -38,6 +39,23 @@ export default function VerifySelfPage() {
     )?.address;
 
   const isConnected = ready && authenticated;
+  // Responsive QR size based on viewport
+  useEffect(() => {
+    const computeSize = () => {
+      if (typeof window === "undefined") return 240;
+      const w = window.innerWidth;
+      if (w < 360) return 200;
+      if (w < 640) return 220;
+      if (w < 768) return 240;
+      if (w < 1024) return 280;
+      return 300;
+    };
+    const update = () => setQrSize(computeSize());
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
 
 
   // Initialize Self App configuration
@@ -138,11 +156,15 @@ export default function VerifySelfPage() {
     } else if (typeof error === 'string') {
       errorMessage = error;
     } else if (error && typeof error === 'object') {
-      // Try to extract error from object
-      const errObj = error as any;
-      if (errObj.message) errorMessage = errObj.message;
-      if (errObj.reason) errorMessage = errObj.reason;
-      if (errObj.code) errorMessage += ` (Code: ${errObj.code})`;
+      // Try to extract error from object with safe checks
+      const maybeMessage = (error as { message?: unknown }).message;
+      const maybeReason = (error as { reason?: unknown }).reason;
+      const maybeCode = (error as { code?: unknown }).code;
+      if (typeof maybeMessage === 'string') errorMessage = maybeMessage;
+      if (typeof maybeReason === 'string') errorMessage = maybeReason;
+      if (typeof maybeCode === 'string' || typeof maybeCode === 'number') {
+        errorMessage += ` (Code: ${maybeCode})`;
+      }
     }
 
     console.error("❌ Final error message:", errorMessage);
@@ -188,11 +210,11 @@ export default function VerifySelfPage() {
   // Show loading while checking connection
   if (isCheckingConnection) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
-          <Loader2 className="w-12 h-12 text-emerald-500 mx-auto mb-4 animate-spin" />
-          <h1 className="text-xl font-semibold text-white mb-2">Loading...</h1>
-          <p className="text-sm text-gray-300">Checking wallet connection...</p>
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-sm sm:max-w-md md:max-w-lg w-full text-center">
+          <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-500 mx-auto mb-4 animate-spin" />
+          <h1 className="text-lg sm:text-xl font-semibold text-white mb-2">Loading...</h1>
+          <p className="text-xs sm:text-sm text-gray-300">Checking wallet connection...</p>
         </div>
       </div>
     );
@@ -201,11 +223,11 @@ export default function VerifySelfPage() {
   // Only show "not connected" if we've finished checking and there's no wallet
   if (!isCheckingConnection && !isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h1 className="text-xl font-semibold text-white mb-2">Wallet Not Connected</h1>
-          <p className="text-sm text-gray-300 mb-6">Please connect your wallet to continue.</p>
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-sm sm:max-w-md md:max-w-lg w-full text-center">
+          <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-500 mx-auto mb-4" />
+          <h1 className="text-lg sm:text-xl font-semibold text-white mb-2">Wallet Not Connected</h1>
+          <p className="text-xs sm:text-sm text-gray-300 mb-6">Please connect your wallet to continue.</p>
           <Link href="/">
             <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2">
               <Home className="w-4 h-4" />
@@ -218,21 +240,21 @@ export default function VerifySelfPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-950">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full text-white">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-gray-950">
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-sm sm:max-w-md md:max-w-lg w-full text-white">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 mx-auto mb-3 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
             {verificationStep === "complete" ? (
-              <CheckCircle className="w-7 h-7 text-white" />
+              <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             ) : verificationStep === "processing" ? (
-              <Loader2 className="w-7 h-7 text-white animate-spin" />
+              <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-spin" />
             ) : (
-              <Shield className="w-7 h-7 text-white" />
+              <Shield className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             )}
           </div>
           
-          <h1 className="text-xl font-semibold mb-1">
+          <h1 className="text-lg sm:text-xl font-semibold mb-1">
             {verificationStep === "complete"
               ? "Verification Complete!"
               : verificationStep === "processing"
@@ -240,7 +262,7 @@ export default function VerifySelfPage() {
               : "Verify with Self"}
           </h1>
           
-          <p className="text-xs text-gray-300">
+          <p className="text-xs sm:text-sm text-gray-300">
             {verificationStep === "complete"
               ? "Your identity has been verified successfully"
               : verificationStep === "processing"
@@ -261,13 +283,13 @@ export default function VerifySelfPage() {
         <div className="flex justify-center">
           {verificationStep === "processing" ? (
             <div className="text-center py-6">
-              <Loader2 className="w-10 h-10 text-emerald-500 mx-auto mb-3 animate-spin" />
-              <p className="text-xs text-gray-400">Verifying your identity...</p>
+              <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500 mx-auto mb-3 animate-spin" />
+              <p className="text-xs sm:text-sm text-gray-400">Verifying your identity...</p>
             </div>
           ) : verificationStep === "complete" ? (
             <div className="text-center py-6">
-              <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-3" />
-              <p className="text-xs text-gray-400 mb-3">Verification Complete!</p>
+              <CheckCircle className="w-12 h-12 sm:w-14 sm:h-14 text-green-500 mx-auto mb-3" />
+              <p className="text-xs sm:text-sm text-gray-400 mb-3">Verification Complete!</p>
               <Link href="/dashboard">
                 <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg flex items-center gap-2 mx-auto">
                   Go to Dashboard
@@ -282,7 +304,7 @@ export default function VerifySelfPage() {
                   selfApp={selfApp}
                   onSuccess={handleSuccess}
                   onError={handleError}
-                  size={240}
+                  size={qrSize}
                 />
               </div>
               {walletAddress && (
@@ -293,8 +315,8 @@ export default function VerifySelfPage() {
             </div>
           ) : (
             <div className="text-center py-6">
-              <AlertCircle className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
-              <p className="text-xs text-gray-400">
+              <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-500 mx-auto mb-3" />
+              <p className="text-xs sm:text-sm text-gray-400">
                 Initializing verification system...
               </p>
             </div>
@@ -305,7 +327,7 @@ export default function VerifySelfPage() {
         {verificationStep === "scan" && (
           <div className="mt-6 pt-6 border-t border-gray-800">
             <h3 className="text-sm font-semibold text-white mb-3">Before you scan:</h3>
-            <ul className="space-y-2 text-xs text-gray-300 mb-4">
+            <ul className="space-y-2 text-xs sm:text-sm text-gray-300 mb-4">
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 mt-0.5">1.</span>
                 <span>Download Self mobile app from App Store or Google Play</span>
@@ -324,7 +346,7 @@ export default function VerifySelfPage() {
               </li>
             </ul>
             <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-3">
-              <p className="text-xs text-amber-200">
+              <p className="text-xs sm:text-sm text-amber-200">
                 <strong>Note:</strong> This is real identity verification, not a test. You must complete actual KYC in the Self app before scanning.
               </p>
             </div>

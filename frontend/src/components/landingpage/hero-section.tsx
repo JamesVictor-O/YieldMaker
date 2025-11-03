@@ -1,15 +1,17 @@
 "use client";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { usePrivy } from "@privy-io/react-auth";
 
 const HeroSection = () => {
+  const { ready, authenticated, login } = usePrivy();
   return (
     <div className="min-h-screen bg-[#101110] relative overflow-hidden">
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#101110] via-[#1a1a1a] to-[#101110] opacity-50"></div>
 
       {/* Hero Section */}
-      <section className="relative pt-16 sm:pt-20 pb-8 min-h-screen flex flex-col justify-center">
+      <section id="home" className="relative pt-16 sm:pt-20 pb-8 min-h-screen flex flex-col justify-center">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="text-center">
             {/* Main heading with improved mobile typography */}
@@ -31,17 +33,26 @@ const HeroSection = () => {
 
             {/* CTA Buttons with improved mobile design */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4 animate-fade-in-up delay-600">
-              <Button
-                asChild
-                className="bg-white text-black hover:bg-gray-100 hover:text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
-              >
-                <a
-                  href="/dashboard"
-                  className="flex items-center justify-center gap-2"
+              {ready && authenticated ? (
+                <Button
+                  asChild
+                  className="bg-white text-black hover:bg-gray-100 hover:text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                 >
-                  <span>Start Earning Now</span>
-                </a>
-              </Button>
+                  <a
+                    href="/dashboard"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <span>Get Started</span>
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  onClick={login}
+                  className="bg-white text-black hover:bg-gray-100 hover:text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                >
+                  <span>Connect Wallet</span>
+                </Button>
+              )}
             </div>
 
             {/* Trust Indicators with improved mobile layout */}
