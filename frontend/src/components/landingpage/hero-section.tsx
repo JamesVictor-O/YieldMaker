@@ -14,9 +14,9 @@ const HeroSection = () => {
           <div className="text-center">
             {/* Main heading with improved mobile typography */}
             <h1 className="flex flex-col text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#fefeff] mb-6 sm:mb-8 leading-tight font-pop">
-              <span className="animate-fade-in-up">Deposit Once</span>
+              <span className="animate-fade-in-up">Turning Passive Crypto</span>
               <span className="animate-fade-in-up delay-200">
-                Earn Everywhere
+               Holders Into Active DeFi Earners
               </span>
             </h1>
 
