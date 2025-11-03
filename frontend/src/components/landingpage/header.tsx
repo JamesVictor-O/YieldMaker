@@ -49,8 +49,14 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-6 lg:space-x-8">
+            <a
+                href="#home"
+                className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
+              >
+                Home
+              </a>
               <a
-                href="#features"
+                href="#key-features"
                 className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
               >
                 Features
@@ -61,12 +67,7 @@ const Header = () => {
               >
                 How it Works
               </a>
-              <a
-                href="#safety"
-                className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
-              >
-                Safety
-              </a>
+             
             </nav>
 
             {/* CTA Button - Mobile First */}
@@ -137,7 +138,7 @@ const Header = () => {
         >
           <div className="px-4 py-3 space-y-1">
             <a
-              href="#features"
+              href="#key-features"
               className="block text-gray-300 hover:text-emerald-400 hover:bg-gray-800/30 transition-colors py-2.5 px-3 rounded-lg text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -151,11 +152,11 @@ const Header = () => {
               How it Works
             </a>
             <a
-              href="#safety"
+              href="#home"
               className="block text-gray-300 hover:text-emerald-400 hover:bg-gray-800/30 transition-colors py-2.5 px-3 rounded-lg text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Safety
+              Home
             </a>
           </div>
         </div>
