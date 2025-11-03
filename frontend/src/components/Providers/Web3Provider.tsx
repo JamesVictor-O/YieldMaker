@@ -15,10 +15,10 @@ interface Web3ProviderProps {
 // Create a query client
 const queryClient = new QueryClient();
 
-// Define Celo Alfajores Testnet
-const celoAlfajores = defineChain({
-  id: 44787,
-  name: 'Celo Alfajores Testnet',
+// Define Celo Mainnet
+const celoMainnet = defineChain({
+  id: 42220,
+  name: 'Celo',
   nativeCurrency: {
     decimals: 18,
     name: 'CELO',
@@ -26,24 +26,24 @@ const celoAlfajores = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://alfajores-forno.celo-testnet.org']
+      http: ['https://forno.celo.org']
     },
   },
   blockExplorers: {
     default: {
       name: 'CeloScan',
-      url: 'https://alfajores.celoscan.io'
+      url: 'https://celoscan.io'
     },
   },
-  testnet: true,
+  testnet: false,
 });
 
-// Wagmi config for Celo Alfajores testnet
+// Wagmi config for Celo Mainnet
 const config = getDefaultConfig({
   appName: "Yieldmaker",
   projectId:
     process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "dummy-project-id",
-  chains: [celoAlfajores],
+  chains: [celoMainnet],
   ssr: true,
 });
 
@@ -56,7 +56,7 @@ export default function Web3Provider({ children }: Web3ProviderProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider initialChain={celoAlfajores} locale="en-US">
+        <RainbowKitProvider initialChain={celoMainnet} locale="en-US">
           <PrivyProvider
             appId={appId}
             config={{

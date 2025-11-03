@@ -219,20 +219,36 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
           {/* Right Column - Strategy & Performance */}
           <div className="space-y-6">
-            {/* Self Verification Prompt (shown when not verified on-chain or registry not configured) */}
-            {(!isVerified || !registryAddress) && (
-              <div className="bg-amber-900/20 border border-amber-800/30 rounded-2xl p-6">
-                <h3 className="text-white font-semibold text-lg mb-2">Get Verified with Self</h3>
-                <p className="text-sm text-amber-200/90 mb-4">
-                  Verify your humanity to unlock more yield opportunities. You can do this anytime.
-                </p>
-                <button
-                  onClick={() => router.push("/verify-self")}
-                  className="px-4 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
-                >
-                  Get Verified with Self
-                </button>
+            {/* Self Verification Status */}
+            {isVerified ? (
+              <div className="bg-emerald-900/20 border border-emerald-800/40 rounded-2xl p-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center mt-0.5">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-lg mb-1">Verified with Self</h3>
+                    <p className="text-sm text-emerald-200/90">
+                      Your identity is verified. You now have access to higher-yield opportunities.
+                    </p>
+                  </div>
+                </div>
               </div>
+            ) : (
+              (!registryAddress || !isVerified) && (
+                <div className="bg-amber-900/20 border border-amber-800/30 rounded-2xl p-6">
+                  <h3 className="text-white font-semibold text-lg mb-2">Get Verified with Self</h3>
+                  <p className="text-sm text-amber-200/90 mb-4">
+                    Verify your humanity to unlock more yield opportunities. You can do this anytime.
+                  </p>
+                  <button
+                    onClick={() => router.push("/verify-self")}
+                    className="px-4 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                  >
+                    Get Verified with Self
+                  </button>
+                </div>
+              )
             )}
             {/* Strategy Overview */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-600 transition-all">

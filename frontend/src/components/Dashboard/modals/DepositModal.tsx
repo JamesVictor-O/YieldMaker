@@ -124,21 +124,25 @@ const DepositModal: React.FC<DepositModalProps> = ({
 
   // Check if approval is needed
   const checkApprovalNeeded = useCallback(
-    async (amountToDeposit: string) => {
+    async (amountToDeposit: string): Promise<boolean> => {
       try {
-        await refetchAllowance();
+        const res = await refetchAllowance();
+        const fresh = (res as unknown as { data?: bigint })?.data;
+        const current = fresh ?? allowance ?? BigInt(0);
         const amountWei = parseEther(amountToDeposit);
-        const needed = allowance < amountWei;
+        const needed = current < amountWei;
         setNeedsApproval(needed);
         console.log("Approval check:", {
           amount: amountToDeposit,
-          allowance: allowance.toString(),
+          allowance: current.toString(),
           amountWei: amountWei.toString(),
           needsApproval: needed,
         });
+        return needed;
       } catch (err) {
         console.error("Error checking approval:", err);
         setNeedsApproval(true);
+        return true;
       }
     },
     [allowance, refetchAllowance]
@@ -159,10 +163,10 @@ const DepositModal: React.FC<DepositModalProps> = ({
         return;
       }
   
-      // Check if approval is needed
-      await checkApprovalNeeded(amount);
-  
-      if (needsApproval) {
+      // Check if approval is needed (use returned boolean, not stale state)
+      const approvalNeeded = await checkApprovalNeeded(amount);
+
+      if (approvalNeeded) {
         // Trigger approval with vault address as spender
         await approve(CONTRACT_ADDRESSES.YIELDMAKER_VAULT, amount);
         // Store pending deposit to trigger after approval
