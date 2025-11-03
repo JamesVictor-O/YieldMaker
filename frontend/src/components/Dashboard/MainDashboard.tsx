@@ -40,11 +40,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   // Get real-time APY from our deployed MockAavePool
   const { apyDisplay, isLoading: apyLoading } = useMockAavePoolAPY();
-
-  // Get Aave strategy balance
   const { balanceFormatted: aaveStrategyBalance } = useAaveStrategyBalance();
-
-  // Convert vault balance to readable format - handle BigInt properly
   const vaultBalanceFormatted =
     vaultBalance && typeof vaultBalance === "bigint"
       ? parseFloat(formatEther(vaultBalance))
@@ -66,8 +62,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       if (savedInitialDeposit) {
         setUserInitialDeposit(parseFloat(savedInitialDeposit));
       } else {
-        // If no initial deposit saved, assume current balance is the initial deposit
-        // This handles existing users who already have deposits
+       
         if (vaultBalanceFormatted > 0) {
           setUserInitialDeposit(vaultBalanceFormatted);
           localStorage.setItem(
@@ -79,15 +74,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     }
   }, [address, vaultBalanceFormatted]);
 
-  // Self verification status is fully on-chain now via useIsVerified
-
   // Calculate real earnings
   const realEarnings = Math.max(0, userBalance - userInitialDeposit);
 
   // Update initial deposit when user makes new deposits
   const handleBalanceUpdate = (newBalance: number) => {
     if (address && newBalance > userBalance) {
-      // User made a deposit, update initial deposit tracker
       const additionalDeposit = newBalance - userBalance;
       const newInitialDeposit = userInitialDeposit + additionalDeposit;
       setUserInitialDeposit(newInitialDeposit);
@@ -103,8 +95,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   ) => {
     user.riskProfile = riskProfile;
     setShowWelcome(false);
-
-    // Mark onboarding as complete in the parent component
     if (onOnboardingComplete) {
       onOnboardingComplete(riskProfile);
     }

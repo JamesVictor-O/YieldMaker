@@ -51,24 +51,7 @@ export default function VerifySelfPage() {
         // For Celo Mainnet use "celo" endpoint type
         const endpointType = chainId === 42220 ? "celo" : "staging_celo";
 
-        console.log("🌐 Network detection:", {
-          currentChainId: chainId,
-          expectedChainId: 44787,
-          selectedEndpointType: endpointType,
-          isAlfajoresTestnet: chainId === 44787,
-        });
-
-        console.log("🔧 Self App Configuration:", {
-          contractAddress,
-          walletAddress,
-          isConnected,
-          chainId,
-          endpointType,
-          appName: "YieldMaker DeFi",
-          scope: "YieldMaker",
-          version: 2,
-          devMode: true,
-        });
+      
 
         const selfAppConfig = {
           appName: "YieldMaker DeFi",
@@ -83,12 +66,7 @@ export default function VerifySelfPage() {
           devMode: false,
         };
 
-        console.log("🔧 Building Self App with config:", selfAppConfig);
-
         const app = new SelfAppBuilder(selfAppConfig as Partial<SelfApp>).build();
-
-        console.log("✅ Self App created successfully");
-        console.log("   App details:", JSON.stringify(app, null, 2));
         setSelfApp(app);
       } catch (error) {
         console.error("❌ Failed to initialize Self app:", error);
@@ -134,17 +112,13 @@ export default function VerifySelfPage() {
 
   // Handle verification errors
   const handleError = useCallback((error: unknown) => {
-    console.error("❌ Verification error (full):", error);
-    console.error("❌ Error type:", typeof error);
-    console.error("❌ Error keys:", error ? Object.keys(error) : "null");
+  
 
     let errorMessage = "Please try again or contact support if the issue persists.";
     let errorTitle = "Verification failed";
 
     // Check for common error scenarios
     if (error instanceof Error) {
-      console.error("❌ Error message:", error.message);
-      console.error("❌ Error stack:", error.stack);
 
       if (error.message.includes("verification") || error.message.includes("KYC")) {
         errorTitle = "Identity Verification Failed";

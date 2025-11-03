@@ -4,6 +4,7 @@
 # Choose between Alfajores Testnet or Celo Mainnet
 
 set -e  # Exit on error
+set -o pipefail  # Fail on pipeline errors
 
 # Colors for output
 RED='\033[0;31m'
@@ -80,8 +81,13 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Source environment variables
+# Preserve selected network variables, then source .env for secrets only
+SELECTED_CHAIN_ID="$CHAIN_ID"
+SELECTED_RPC_URL="$RPC_URL"
 source .env
+# Restore selection to prevent .env from overriding network choice
+CHAIN_ID="$SELECTED_CHAIN_ID"
+RPC_URL="$SELECTED_RPC_URL"
 
 # Check required environment variables
 if [ -z "$PRIVATE_KEY" ]; then
@@ -162,7 +168,8 @@ deploy_contract() {
         -vvv \
         2>&1 | tee -a $LOG_FILE
 
-    if [ $? -eq 0 ]; then
+    exitcode=${PIPESTATUS[0]}
+    if [ $exitcode -eq 0 ]; then
         echo -e "${GREEN}✓ ${contract_name} deployed successfully${NC}"
         return 0
     else

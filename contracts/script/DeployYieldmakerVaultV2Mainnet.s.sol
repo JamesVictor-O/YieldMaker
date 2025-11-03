@@ -18,10 +18,9 @@ contract DeployYieldmakerVaultV2Mainnet is Script {
         require(block.chainid == CELO_MAINNET_CHAIN_ID, "Must deploy to Celo Mainnet (42220)");
         require(deployer.balance >= 1 ether, "Deployer balance too low (need >= 1 CELO)");
 
-        console.log("\n╔════════════════════════════════════════════════════════╗");
-        console.log("║         DEPLOYING TO CELO MAINNET                      ║");
-        console.log("║         !!! THIS WILL COST REAL FUNDS !!!              ║");
-        console.log("╚════════════════════════════════════════════════════════╝\n");
+        console.log("\n=== DEPLOYING TO CELO MAINNET ===");
+        console.log("WARNING: THIS WILL COST REAL FUNDS");
+        console.log("==================================\n");
 
         console.log("Deployer:", deployer);
         console.log("Asset (cUSD):", CUSD);
@@ -56,9 +55,7 @@ contract DeployYieldmakerVaultV2Mainnet is Script {
 
         vm.stopBroadcast();
 
-        console.log("\n╔════════════════════════════════════════════════════════╗");
-        console.log("║   MAINNET DEPLOYMENT SUCCESSFUL                        ║");
-        console.log("╚════════════════════════════════════════════════════════╝\n");
+        console.log("\n=== MAINNET DEPLOYMENT SUCCESSFUL ===\n");
 
         console.log("Verify contracts on:");
         console.log("https://celoscan.io/address/", vm.toString(address(vault)));

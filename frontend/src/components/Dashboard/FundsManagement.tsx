@@ -39,19 +39,10 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
     const savedTransactions = localStorage.getItem("userTransactions");
     if (savedTransactions) {
       try {
-        console.log("Loading saved transactions:", savedTransactions);
+        
         const rawTransactions = JSON.parse(savedTransactions);
-        console.log("Parsed transactions:", rawTransactions);
 
         const transactions = rawTransactions.map((tx: Partial<Transaction>) => {
-          console.log(
-            "Processing transaction:",
-            tx,
-            "amount:",
-            tx.amount,
-            "type:",
-            typeof tx.amount
-          );
           return {
             ...tx,
             amount: Number(tx.amount) || 0, // Ensure amount is a valid number
@@ -156,8 +147,6 @@ const FundsManagement: React.FC<FundsManagementProps> = ({
         return "text-gray-400";
     }
   };
-
-  // Calculate 24h change (simplified - in reality this would be more complex)
   const dailyChangePercent = realEarnings > 0 ? 2.4 : 0;
 
   return (

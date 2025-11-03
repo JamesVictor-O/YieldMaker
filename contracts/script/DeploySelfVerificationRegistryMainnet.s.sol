@@ -33,10 +33,9 @@ contract DeploySelfVerificationRegistryMainnet is Script {
         require(block.chainid == CELO_MAINNET_CHAIN_ID, "Must deploy to Celo Mainnet (42220)");
         require(deployer.balance >= MIN_DEPLOYER_BALANCE, "Deployer balance too low (need >= 1 CELO)");
 
-        console2.log("\n╔════════════════════════════════════════════════════════╗");
-        console2.log("║         DEPLOYING TO CELO MAINNET                      ║");
-        console2.log("║         !!! THIS WILL COST REAL FUNDS !!!              ║");
-        console2.log("╚════════════════════════════════════════════════════════╝\n");
+        console2.log("\n=== DEPLOYING TO CELO MAINNET ===");
+        console2.log("WARNING: THIS WILL COST REAL FUNDS");
+        console2.log("==================================\n");
 
         console2.log("Network: Celo Mainnet");
         console2.log("Chain ID:", block.chainid);
@@ -64,9 +63,7 @@ contract DeploySelfVerificationRegistryMainnet is Script {
         vm.stopBroadcast();
 
         // Post-deployment verification
-        console2.log("\n╔════════════════════════════════════════════════════════╗");
-        console2.log("║         DEPLOYMENT SUCCESSFUL                          ║");
-        console2.log("╚════════════════════════════════════════════════════════╝\n");
+        console2.log("\n=== DEPLOYMENT SUCCESSFUL ===\n");
 
         console2.log("SelfVerificationRegistry:", address(registry));
         console2.log("Owner:", registry.owner());
