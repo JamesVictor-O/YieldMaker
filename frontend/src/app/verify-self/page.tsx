@@ -44,12 +44,12 @@ export default function VerifySelfPage() {
   useEffect(() => {
     if (walletAddress && isConnected) {
       try {
-        const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 ||
-                               process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 ||
+        const contractAddress = process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_42220 ||
+                               process.env.NEXT_PUBLIC_YIELDMAKER_CONTRACT_ADDRESS_44787 ||
                                "0x...";
 
-        // For Celo Alfajores testnet, use "staging_celo" endpoint type
-        const endpointType = chainId === 44787 ? "staging_celo" : "celo";
+        // For Celo Mainnet use "celo" endpoint type
+        const endpointType = chainId === 42220 ? "celo" : "staging_celo";
 
         console.log("🌐 Network detection:", {
           currentChainId: chainId,
@@ -78,9 +78,9 @@ export default function VerifySelfPage() {
           userId: walletAddress.toLowerCase(),
           userIdType: "hex",
           version: 2,
-          chainID: 44787, // Celo Alfajores testnet (Self SDK supported)
+          chainID: 42220, // Celo Mainnet
           userDefinedData: "yieldmaker_verification",
-          devMode: true, // Enable dev mode for testnet
+          devMode: false,
         };
 
         console.log("🔧 Building Self App with config:", selfAppConfig);

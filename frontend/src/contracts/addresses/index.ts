@@ -1,23 +1,21 @@
-// Contract addresses for Celo Alfajores Testnet
-// NOTE: These addresses need to be updated after deployment to Alfajores
-// Run deployment scripts from /contracts/script to deploy and get new addresses
+// Contract addresses for Celo Mainnet
+// NOTE: Update these after mainnet deployment. Placeholders are set where needed.
 export const CONTRACT_ADDRESSES = {
-  // Deployed contracts - Deployed to Celo Alfajores
-  YIELDMAKER_VAULT: "0x2f00C10f7e0B6772a0d01d0F742590753eDBE08B", // ✅ YieldmakerVault on Celo Alfajores
-  SIMPLE_HOLD_STRATEGY: "0xb446fD8B6ADc9BF71C3f531218F625EF1c86F87A", // ✅ SimpleHoldStrategy on Celo Alfajores
+  // Deployed contracts - Celo Mainnet (set after deployment)
+  YIELDMAKER_VAULT: "0x0000000000000000000000000000000000000000", // TODO: set after mainnet deploy
+  SIMPLE_HOLD_STRATEGY: "0x0000000000000000000000000000000000000000", // TODO: set after mainnet deploy
 
 
 
-  // Asset addresses
-  CUSD: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1", // ✅ cUSD on Celo Alfajores
+  // Asset addresses (Celo Mainnet)
+  CUSD: "0x765DE816845861e75A25fCA122bb6898B8B1282a", // ✅ cUSD on Celo Mainnet
 
-  // Protocol addresses - TODO: Find Alfajores protocol addresses
-  // NOTE: Aave V3 may not be deployed on Alfajores yet
-  AAVE_POOL: "0x0000000000000000000000000000000000000000", // ⚠️ TODO: Get Aave V3 on Alfajores
-  AAVE_STRATEGY: "0x0000000000000000000000000000000000000000", // ⚠️ TODO: Deploy AaveStrategy to Alfajores
+  // Protocol addresses - set when integrating on mainnet
+  AAVE_POOL: "0x0000000000000000000000000000000000000000", // TODO
+  AAVE_STRATEGY: "0x0000000000000000000000000000000000000000", // TODO
 
-  // Self Protocol Verification - Deployed to Celo Alfajores
-  SELF_VERIFICATION_REGISTRY: "0xb446fD8B6ADc9BF71C3f531218F625EF1c86F87A", // ✅ SelfVerificationRegistry on Celo Alfajores
+  // Self Protocol Verification - Celo Mainnet (set after deploy)
+  SELF_VERIFICATION_REGISTRY: "0x0000000000000000000000000000000000000000", // TODO: set after mainnet deploy
  
   AAVE_POOL_ADDRESS_PROVIDER: "0x0000000000000000000000000000000000000000", // TODO: Get Aave V3 PoolAddressProvider on Celo L2
  
