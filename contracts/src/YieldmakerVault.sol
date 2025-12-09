@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./IStrategy.sol";
+import "./interfaces/IStrategy.sol";
 
 // Optional Self verification registry interface
 interface ISelfVerificationRegistry {

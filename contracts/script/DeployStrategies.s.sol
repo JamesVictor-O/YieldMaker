@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
-import "../src/AaveStrategy.sol";
-import "../src/CompoundStrategy.sol";
-import "../src/YearnStrategy.sol";
-import "../src/UniswapV3Strategy.sol";
+import "../src/strategies/AaveStrategy.sol";
+import "../src/strategies/CompoundStrategy.sol";
+import "../src/strategies/YearnStrategy.sol";
+import "../src/strategies/UniswapV3Strategy.sol";
 import "../src/YieldmakerVault.sol";
 
 contract DeployStrategies is Script {

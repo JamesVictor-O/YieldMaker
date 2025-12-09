@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./IStrategy.sol";
+import "../interfaces/IStrategy.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {DataTypes} from "@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol"; 
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";  

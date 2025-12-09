@@ -36,9 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html className="dark" lang="en">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-background-light dark:bg-background-dark text-slate-900 dark:text-white`}
       >
         <Web3Provider>
           <FarcasterSDKProvider>

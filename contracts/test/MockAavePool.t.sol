@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import "../src/mocks/MockAavePool.sol";
-import "../src/AaveStrategy.sol";
+import "../src/strategies/AaveStrategy.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {DataTypes} from "@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol";
 

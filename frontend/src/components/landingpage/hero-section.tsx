@@ -1,123 +1,156 @@
-"use client";
-import { Button } from "../ui/button";
-import Image from "next/image";
-import { usePrivy } from "@privy-io/react-auth";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import {
+  CheckCircle,
+  TrendingUp,
+  Bitcoin,
+  Coins,
+} from "lucide-react";
 
-const HeroSection = () => {
-  const { ready, authenticated, login } = usePrivy();
+const Hero: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#101110] relative overflow-hidden">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#101110] via-[#1a1a1a] to-[#101110] opacity-50"></div>
+    <section className="relative pt-12 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-      {/* Hero Section */}
-      <section id="home" className="relative pt-16 sm:pt-20 pb-8 min-h-screen flex flex-col justify-center">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-          <div className="text-center">
-            {/* Main heading with improved mobile typography */}
-            <h1 className="flex flex-col text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#fefeff] mb-6 sm:mb-8 leading-tight font-pop">
-              <span className="animate-fade-in-up">Turning Passive Crypto</span>
-              <span className="animate-fade-in-up delay-200">
-               Holders Into Active DeFi Earners
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Hero Content */}
+          <div className="flex flex-col gap-6 text-center lg:text-left">
+          
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
+              Institutional-Grade <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary">
+                DeFi Yields
               </span>
+              , <br />
+              Powered by AI.
             </h1>
 
-            {/* Subtitle with better mobile spacing */}
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-2 sm:px-0 animate-fade-in-up delay-400">
-              Earn from DeFi without the complexity{" "}
-              <span className="font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                YieldMaker&apos;s AI
-              </span>{" "}
-              does all the work for you. You just deposit and relax.
+            <p className="text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Stop guessing. Let Yieldmaker&apos;s intelligent algorithms
+              optimize your crypto portfolio for maximum returns and minimized
+              risk. Auto-compounding, gas-efficient, and secure.
             </p>
 
-            {/* CTA Buttons with improved mobile design */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4 animate-fade-in-up delay-600">
-              {ready && authenticated ? (
-                <Button
-                  asChild
-                  className="bg-white text-black hover:bg-gray-100 hover:text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
-                >
-                  <a
-                    href="/dashboard"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <span>Get Started</span>
-                  </a>
-                </Button>
-              ) : (
-                <Button
-                  onClick={login}
-                  className="bg-white text-black hover:bg-gray-100 hover:text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
-                >
-                  <span>Connect Wallet</span>
-                </Button>
-              )}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
+              <Button
+                size="lg"
+                className="shadow-[0_0_20px_rgba(19,236,109,0.3)] hover:scale-105 transform"
+              >
+                Start Earning
+              </Button>
             </div>
 
-            {/* Trust Indicators with improved mobile layout */}
-            <div className="mt-10 md:mt-0 flex flex-row  justify-center items-center gap-4 sm:gap-6 lg:gap-8 text-gray-300 px-4 animate-fade-in-up delay-800">
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-white/10">
-                <svg
-                  className="w-4 h-4 text-green-400 hidden md:block"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-[10px] sm:text-sm font-medium">
-                  Audited Protocols
-                </span>
+            <div className="mt-8 flex items-center justify-center lg:justify-start gap-4 text-sm text-slate-500 dark:text-gray-400">
+              <div className="flex items-center gap-1">
+                <CheckCircle className="w-4 h-4 text-primary" />
+                <span>Audited by Certik</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-white/10">
-                <svg
-                  className="w-4 h-4 text-blue-400 hidden md:block"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-[10px] sm:text-sm font-medium ">
-                  Auto Rebalancing
-                </span>
+              <div className="w-1 h-1 bg-slate-400 rounded-full"></div>
+              <div className="flex items-center gap-1">
+                <CheckCircle className="w-4 h-4 text-primary" />
+                <span>Non-Custodial</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-white/10">
-                <svg
-                  className="w-4 h-4 text-yellow-400 hidden md:block"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-[10px] sm:text-sm font-medium">
-                  No Hidden Fees
-                </span>
+            </div>
+          </div>
+
+          {/* Hero Visual */}
+          <div className="relative lg:h-auto w-full aspect-square lg:aspect-auto flex items-center justify-center">
+            {/* Abstract Dashboard Representation */}
+            <div className="relative w-full max-w-md lg:max-w-full">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-blue-500/20 rounded-2xl blur-2xl -z-10 transform rotate-6 scale-95"></div>
+
+              <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
+                {/* Mock Graph Header */}
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-text-secondary">
+                      Total Portfolio Value
+                    </p>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                      $124,592.45
+                    </h3>
+                  </div>
+                  <div className="px-3 py-1 bg-primary/10 rounded-lg text-primary text-sm font-bold flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" />
+                    +12.4% APY
+                  </div>
+                </div>
+
+                {/* Mock Graph Bars */}
+                <div className="flex items-end justify-between gap-2 h-48 w-full mb-6">
+                  {[40, 55, 35, 65, 50, 75].map((height, i) => (
+                    <div
+                      key={i}
+                      className="w-full bg-primary/20 rounded-t-sm transition-all duration-500 hover:bg-primary/40 cursor-pointer relative group"
+                      style={{ height: `${height}%` }}
+                    >
+                      <div className="absolute bottom-0 left-0 w-full bg-primary/10 h-0 group-hover:h-full transition-all duration-300"></div>
+                    </div>
+                  ))}
+                  <div className="w-full bg-primary rounded-t-sm h-[90%] shadow-[0_0_15px_rgba(19,236,109,0.4)] relative">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-dark border border-border-dark text-white text-xs py-1 px-2 rounded opacity-0 hover:opacity-100 transition-opacity">
+                      Today
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mock List Items */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-background-dark/50 border border-gray-100 dark:border-white/5 hover:border-primary/20 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
+                        <Bitcoin className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                          Bitcoin Strategy
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-text-secondary">
+                          Conservative • Low Risk
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">
+                        $42,300
+                      </p>
+                      <p className="text-xs text-primary font-medium">+5.2%</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-background-dark/50 border border-gray-100 dark:border-white/5 hover:border-primary/20 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500">
+                        <Coins className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                          Stablecoin LP
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-text-secondary">
+                          Aggressive • High Yield
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">
+                        $82,292
+                      </p>
+                      <p className="text-xs text-primary font-medium">+18.4%</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Improved image positioning for mobile */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 hidden md:block sm:transform-none sm:bottom-0 sm:left-0 z-0">
-          <Image
-            src="/coin2.png"
-            alt="coin"
-            width={500}
-            height={500}
-            className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-60 lg:h-60 opacity-80 hover:opacity-100 transition-opacity duration-300"
-          />
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 
-export default HeroSection;
+export default Hero;

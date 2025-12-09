@@ -1,8 +1,12 @@
 import Header from "@/components/landingpage/header";
 import HeroSection from "@/components/landingpage/hero-section";
 import FarcasterIndicator from "@/components/FarcasterIndicator";
-import KeyFeatures from "@/components/landingpage/key-features";
+
 import HowItWorks from "@/components/landingpage/how-it-works";
+import FeaturesModern from "@/components/landingpage/features-modern";
+import Stats from "@/components/landingpage/stats";
+import FAQ from "@/components/landingpage/faq";
+import Footer from "@/components/landingpage/footer";
 
 export default function Home() {
   return (
@@ -10,8 +14,11 @@ export default function Home() {
       <FarcasterIndicator />
       <Header />
       <HeroSection />
-      <KeyFeatures />
+      <FeaturesModern />
       <HowItWorks />
+      <Stats />
+      <FAQ />
+      <Footer />
     </div>
   );
 }

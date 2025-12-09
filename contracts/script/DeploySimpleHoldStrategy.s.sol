@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
-import "../src/SimpleHoldStrategy.sol";
+import "../src/strategies/SimpleHoldStrategy.sol";
 
 contract DeploySimpleHoldStrategy is Script {
     // Celo Alfajores addresses
