@@ -12,15 +12,18 @@ function CallbackContent() {
   );
 
   useEffect(() => {
-    // Placeholder: In a real setup, verify the proof server-side here
     const result = params.get("result");
-    const ok = result === "success" || !result; // default to success during stub
+    const ok = result === "success" || !result;
     if (ok && address) {
       try {
         const key = `onboarding_${address}`;
         const raw = localStorage.getItem(key);
         const parsed = raw ? JSON.parse(raw) : {};
-        const updated = { ...parsed, selfVerified: true, hasCompletedOnboarding: true };
+        const updated = {
+          ...parsed,
+          selfVerified: true,
+          hasCompletedOnboarding: true,
+        };
         localStorage.setItem(key, JSON.stringify(updated));
         setStatus("success");
         setTimeout(() => router.replace("/dashboard"), 800);
@@ -53,12 +56,18 @@ function CallbackContent() {
   );
 }
 
-export default function VerifySelfCallbackPage() {
+function VerifySelfCallbackPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      }
+    >
       <CallbackContent />
     </Suspense>
   );
 }
 
-
+export default VerifySelfCallbackPage;

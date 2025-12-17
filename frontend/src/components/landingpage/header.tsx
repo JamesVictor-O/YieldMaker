@@ -1,20 +1,49 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { usePrivy } from "@privy-io/react-auth";
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { ready, authenticated, user, login } = usePrivy();
+  const router = useRouter();
+
+  const isConnected = ready && authenticated;
+
+  type MinimalWallet = { address?: string };
+  type MinimalLinkedAccount = { type?: string; address?: string };
+
+  const getDisplayAddress = (): string | undefined => {
+    const embeddedAddress = (user?.wallet as MinimalWallet | undefined)
+      ?.address;
+    const linkedAddress = (
+      user?.linkedAccounts as MinimalLinkedAccount[] | undefined
+    )?.find((account) => account?.type === "wallet")?.address;
+    const address = embeddedAddress || linkedAddress;
+    if (!address) return undefined;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const displayAddress = getDisplayAddress();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLaunchApp = () => {
+    if (isConnected) {
+      router.push("/dashboard");
+    } else {
+      login();
+    }
+  };
 
   return (
     <header
@@ -60,9 +89,13 @@ const Header: React.FC = () => {
 
           {/* CTA */}
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="hidden sm:flex">
-              <Button size="sm">Launch App</Button>
-            </Link>
+            <Button
+              size="sm"
+              className="hidden sm:flex"
+              onClick={handleLaunchApp}
+            >
+              {isConnected ? displayAddress || "Connected" : "Connect Wallet"}
+            </Button>
 
             {/* Mobile Menu Button */}
             <button
@@ -105,9 +138,15 @@ const Header: React.FC = () => {
             >
               FAQ
             </a>
-            <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button className="w-full">Launch App</Button>
-            </Link>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                handleLaunchApp();
+              }}
+            >
+              {isConnected ? displayAddress || "Connected" : "Connect Wallet"}
+            </Button>
           </nav>
         </div>
       )}

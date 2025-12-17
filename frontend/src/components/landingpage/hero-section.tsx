@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
@@ -6,8 +9,22 @@ import {
   Bitcoin,
   Coins,
 } from "lucide-react";
+import { usePrivy } from "@privy-io/react-auth";
 
 const Hero: React.FC = () => {
+  const { ready, authenticated, login } = usePrivy();
+  const router = useRouter();
+
+  const isConnected = ready && authenticated;
+
+  const handleStartEarning = () => {
+    if (isConnected) {
+      router.push("/dashboard");
+    } else {
+      login();
+    }
+  };
+
   return (
     <section className="relative pt-12 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
       {/* Background decorative elements */}
@@ -39,8 +56,9 @@ const Hero: React.FC = () => {
               <Button
                 size="lg"
                 className="shadow-[0_0_20px_rgba(19,236,109,0.3)] hover:scale-105 transform"
+                onClick={handleStartEarning}
               >
-                Start Earning
+                {isConnected ? "Start Earning" : "Connect Wallet"}
               </Button>
             </div>
 

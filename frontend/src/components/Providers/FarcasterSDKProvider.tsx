@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useFarcasterSDK } from "@/hooks/useFarcasterSDK";
 
 interface FarcasterSDKProviderProps {
@@ -11,39 +12,38 @@ export default function FarcasterSDKProvider({
 }: FarcasterSDKProviderProps) {
   const { isReady, isLoading, error, isInFarcaster } = useFarcasterSDK();
 
-  // Show loading screen while SDK initializes
-  if (isLoading) {
+  // Don't block the app - render immediately and initialize in background
+  // Only show loading for a very short time (max 500ms) to avoid bad UX
+  const [showBriefLoading, setShowBriefLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // Hide loading screen after max 500ms, even if SDK is still initializing
+    const timer = setTimeout(() => {
+      setShowBriefLoading(false);
+    }, 500);
+
+    // If SDK finishes before timeout, hide loading immediately
+    if (!isLoading) {
+      clearTimeout(timer);
+      setShowBriefLoading(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  // Show brief loading screen only for first 500ms
+  if (showBriefLoading && isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Initializing YieldMaker...</p>
+          <p className="text-gray-400">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Show error screen if SDK initialization failed
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-white text-xl font-semibold mb-2">
-            Initialization Error
-          </h2>
-          <p className="text-gray-400 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Render the app once SDK is ready
+  // Always render the app - don't block on SDK initialization
+  // SDK will initialize in the background
   return <>{children}</>;
 }
