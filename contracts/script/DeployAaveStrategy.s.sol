@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import "../src/AaveStrategy.sol";
+import "../src/strategies/AaveStrategy.sol";
 
 contract DeployAaveStrategy is Script {
     // Celo L2 Addresses - TODO: Replace with actual addresses

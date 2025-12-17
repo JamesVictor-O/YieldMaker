@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 import "../src/YieldmakerVault.sol";
-import "../src/IStrategy.sol";
-import "../src/NullStrategy.sol";
+import "../src/interfaces/IStrategy.sol";
+import "../src/strategies/NullStrategy.sol";
 
 contract DeployYieldmakerVault is Script {
     function setUp() public {}

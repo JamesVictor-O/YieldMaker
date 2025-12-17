@@ -239,7 +239,6 @@ export default function AppNavigation() {
           </div>
         </div>
       </div>
-
       {/* Mobile top bar - Dark Theme Consistent */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-md border-b border-gray-800/50 shadow-xl">
         <div className="flex items-center justify-between px-3 py-2.5">
@@ -252,8 +251,6 @@ export default function AppNavigation() {
             </button>
 
           </div>
-
-          {/* Mobile Wallet Button - Compact */}
           <div className="bg-gray-800/60 border border-gray-700/50 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700/70 transition-all duration-200 active:scale-95">
             {isConnected ? (
               <button onClick={logout} className="flex items-center gap-1.5">

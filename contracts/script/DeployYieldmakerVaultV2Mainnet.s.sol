@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 import "../src/YieldmakerVault.sol";
-import "../src/SimpleHoldStrategy.sol";
+import "../src/strategies/SimpleHoldStrategy.sol";
 
 contract DeployYieldmakerVaultV2Mainnet is Script {
     // Celo Mainnet addresses

@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/YieldmakerVault.sol";
-import "../src/AaveStrategy.sol";
+import "../src/strategies/AaveStrategy.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -86,12 +86,21 @@ contract MockAavePoolOld {
 
     function withdraw(address asset, uint256 amount, address to) external returns (uint256) {
         require(asset == address(usdc), "Only USDC supported");
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        balances[msg.sender] -= amount;
-        totalSupplied -= amount;
-        MockAToken(mockATokenAddress).burn(msg.sender, amount);
-        IERC20(asset).transfer(to, amount);
-        return amount;
+        
+        uint256 userBalance = balances[msg.sender];
+        uint256 amountToWithdraw = amount;
+        
+        if (amount == type(uint256).max) {
+            amountToWithdraw = userBalance;
+        }
+
+        require(userBalance >= amountToWithdraw, "Insufficient balance");
+        
+        balances[msg.sender] -= amountToWithdraw;
+        totalSupplied -= amountToWithdraw;
+        MockAToken(mockATokenAddress).burn(msg.sender, amountToWithdraw);
+        IERC20(asset).transfer(to, amountToWithdraw);
+        return amountToWithdraw;
     }
 
     function _redeemUnderlying(address to, uint256 amount) external {

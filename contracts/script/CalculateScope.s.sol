@@ -19,3 +19,7 @@ contract CalculateScope is Script {
         console2.log("Set SELF_SCOPE in .env to:", scopeValue);
     }
 }
+
+
+
+

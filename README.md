@@ -2,7 +2,7 @@
 
 <!-- ![Yieldmaker Logo](https://via.placeholder.com/150?text=Yieldmaker)  -->
 
-**Yieldmaker** is an AI-powered platform that makes decentralized finance (DeFi) yield investing seamless, safe, and accessible to all. Whether you're a crypto novice like a fish seller in a village or an experienced trader, Yieldmaker empowers you to earn yields with confidence, without navigating complex dashboards or risking scams.
+**Yieldmaker** is an AI-powered platform that makes decentralized finance (DeFi) yield investing seamless, safe, and accessible to all. Whether you're a crypto novice like a fish seller in a village or an experienced trader, Yieldmaker empowers you to earn yields with confidence, without navigating complex dashboards or risking scams deployed on the celo blockchain as a mini-ap on farcaster.
 
 ---
 
